@@ -64,10 +64,8 @@ final class I<A> {
         let start = incremental.freshTimeAfterCurrent()
         func run() {
             let v = value!()
-            print(incremental.currentTime)
             reader(v)
             let timespan = (start, incremental.currentTime)
-            assert(timespan.0 <= timespan.1, "\(timespan, v)")
             outEdges.append(Edge(reader: run, timeSpan: timespan))
         }
         run()
@@ -154,9 +152,6 @@ final class Incremental {
     
     fileprivate func freshTimeAfterCurrent() -> T {
         currentTime = clock.insert(after: currentTime)
-        if currentTime.time == 35 {
-            print("35!")
-        }
         return currentTime
     }
     
@@ -182,12 +177,8 @@ final class Incremental {
             guard clock.contains(t: edge.timeSpan.start) else {
                 continue
             }
-            
             clock.delete(between: edge.timeSpan.start, and: edge.timeSpan.end)
-            // todo not sure if the following line is correct
-            //queue.remove(where: { $0.timeSpan.start >= edge.timeSpan.start && $0.timeSpan.end <= edge.timeSpan.end })
             currentTime = edge.timeSpan.start
-            print("current time: \(currentTime)")
             edge.reader()
         }
         currentTime = theTime
@@ -266,8 +257,7 @@ extension Incremental {
         let tail: I<IList<Element>> = self.constant(.empty)
         var result: I<IList<Element>> = tail
         for item in sequence {
-            let new: IList<Element> = IList<Element>.cons(item, tail: result)
-            result = self.constant(new)
+            result = self.constant(.cons(item, tail: result))
         }
         
         return (result, tail)
@@ -298,10 +288,8 @@ extension Incremental {
         })
         var t = tail
         func appendChange(el: ArrayChange<Element>) {
-            print(t.value!())
             let newTail: I<IList<ArrayChange<Element>>> = constant(.empty)
             t.write(.cons(el, tail: newTail))
-            print(newTail.time)
             t = newTail
         }
         return IArray(latest: latest, changes: changes, change: appendChange)
@@ -314,11 +302,12 @@ func if_<A: Equatable>(_ cond: I<Bool>, _ then: @autoclosure @escaping () -> I<A
 
 func testArray() {
     let arr = inc.array(initial: [] as [Int])
-    arr.latest.read {
-        print($0)
-    }
+    let size: I<String> = if_(arr.latest.map { $0.count > 1 }, inc.constant("large"), else: inc.constant("small"))
+    size.read { print($0) }
     arr.change(.append(4))
+    inc.propagate()
     arr.change(.append(5))
+    arr.change(.insert(element: 0, at: 0))
     inc.propagate()
 }
 
