@@ -8,7 +8,11 @@
 
 import Foundation
 
-struct T: Comparable {
+struct T: Comparable, Hashable {
+    var hashValue: Int {
+        return time.hashValue
+    }
+    
     static func <(lhs: T, rhs: T) -> Bool {
         return lhs.time < rhs.time
     }
@@ -49,8 +53,8 @@ struct Clock {
     }
     
     mutating func delete(between from: T, and to: T) {
-        assert(from.time <= to.time, "\(from.time) <= \(to.time)")
-        backing.remove(where: { $0 > from && $0 <= to})
+        assert(from.time <= to.time, "\(from.time) <= \(to.time))")
+        backing.remove(where: { $0 > from && $0 < to})
     }
     
     func contains(t: T) -> Bool {
