@@ -20,22 +20,35 @@ class ViewController: UITableViewController {
         backing = ["One", "Two", "Three", "Four"]
         let iArray = inc.array(initial: backing)
         change = iArray.change
-        let signal: I<[String]> = self.inc.reduce(isEqual: ==, iArray.changes, self.backing, { b, change in
-            let new = b.applying(change: change)
-            self.backing = new
-            self.animate(change)
-            return new
+        let initialChanges: [ArrayChange<String>] = []
+        let acc: ([String], [ArrayChange<String>]) = (backing, initialChanges)
+        let comp: (([String], [ArrayChange<String>]), ([String], [ArrayChange<String>])) -> Bool = { $0.0 == $1.0 && $0.1 == $1.1 }
+        var processed: Int = 0
+        let signal: I<([String], [ArrayChange<String>])> = self.inc.reduce(isEqual: comp, iArray.changes, acc, { acc, change in
+            let new: [String] = acc.0.applying(change: change)
+            return (new, acc.1 + [change])
         })
-        signal.read { c in
+        signal.read { (c, changes) in
             self.backing = c
+            let newProcessed = changes.count
+            self.tableView.beginUpdates()
+            for c in changes.dropFirst(processed) {
+                self.animate(c)
+                print(c)
+            }
+            self.tableView.endUpdates()
+            processed = newProcessed
         }
     }
     
     func animate(_ change: ArrayChange<String>) {
+        func ip(_ int: Int) -> IndexPath { return IndexPath(row: int, section: 0)}
         switch change {
         case .append(_):
-            let newIndexPath = IndexPath(row: backing.count-1, section: 0)
+            let newIndexPath = ip(backing.count-1)
             tableView.insertRows(at: [newIndexPath], with: .automatic)
+        case let .insert(_, at: i):
+            tableView.insertRows(at: [ip(i)], with: .automatic)
         default:
             fatalError()
         }
@@ -52,6 +65,7 @@ class ViewController: UITableViewController {
     }
 
     @IBAction func add(_ sender: Any) {
+        change(.insert(element: "Hi", at: Int(arc4random()) % (backing.count)))
         change(.append("A Number"))
         inc.propagate()
     }

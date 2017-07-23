@@ -43,15 +43,19 @@ func testMinimal() {
 }
 
 func testArray() {
-    let arr = inc.array(initial: [] as [Int])
-    let size: I<String> = if_(arr.latest.map { $0.count > 1 }, inc.constant("large"), else: inc.constant("small"))
+    let (arr, change) = inc.array(initial: [] as [Int])
+    let latest: I<[Int]> = inc.reduce(isEqual: ==, arr.changes, arr.initial) { l, el in
+        l.applying(change: el)
+    }
+
+    let size: I<String> = if_(latest.map { $0.count > 1 }, inc.constant("large"), else: inc.constant("small"))
     size.observe {
         print($0)
     }
-    arr.change(.append(4))
+    change(.append(4))
     inc.propagate()
-    arr.change(.append(5))
-    arr.change(.insert(element: 0, at: 0))
+    change(.append(5))
+    change(.insert(element: 0, at: 0))
     inc.propagate()
 }
 
@@ -103,7 +107,17 @@ func test() {
     print("Done")
 }
 
+func test2() {
+    let x = Var(5)
+    let sum = inc.read(x).zip(inc.read(x), +)
+    sum.read {
+        print("sum: \($0)")
+    }
+    inc.propagate()
+}
+
 test()
+test2()
 testGui()
 testArray()
 testMinimal()

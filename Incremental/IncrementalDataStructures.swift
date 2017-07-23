@@ -26,6 +26,16 @@ enum ArrayChange<Element>: Equatable where Element: Equatable {
         }
     }
 }
+//
+//func lift<Element: Equatable>(_ isIncluded: (Element) -> Bool) -> (ArrayChange<Element>) -> Bool {
+//    return { c in
+//        switch c {
+//        case let .insert(element, at: index):
+//            return isIncluded(element)
+//            case
+//        }
+//    }
+//}
 
 extension Array where Element: Equatable {
     func applying(change: ArrayChange<Element>) -> [Element] {
@@ -55,11 +65,13 @@ indirect enum IList<A: Equatable>: Equatable {
     }
 }
 
-struct IArray<Element: Equatable> {
-    //    let initial: [Element]
-    let latest: I<[Element]>
+struct IArray<Element: Equatable>: Equatable {
+    let initial: [Element]
     let changes: I<IList<ArrayChange<Element>>>
-    let change: (ArrayChange<Element>) -> ()
+}
+
+func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
+    return false
 }
 
 extension Incremental {
@@ -85,7 +97,6 @@ extension Incremental {
             }
         }
         let destination: I<Result> = I(incremental: self, isEqual: isEqual)
-        //destination.write(initial)        
         reduceH(list, intermediate: initial, destination: destination)
         return destination
     }
@@ -106,18 +117,43 @@ extension Incremental {
         return destination
     }
     
-    func array<Element: Equatable>(initial: [Element]) -> (IArray<Element>) {
+    func array<Element: Equatable>(initial: [Element]) -> (IArray<Element>, change: (ArrayChange<Element>) -> ()) {
         let x: [ArrayChange<Element>] = []
-        let (changes, tail) = list(from: x)
-        let latest: I<[Element]> = reduce(isEqual: ==, changes, initial, { arr, change in
-            arr.applying(change: change)
-        })
-        var t = tail
+        var (changes, tail) = list(from: x)
         func appendChange(change: ArrayChange<Element>) {
             let newTail: I<IList<ArrayChange<Element>>> = self.constant(.empty)
-            t.write(.cons(change, tail: newTail))
-            t = newTail
+            tail.write(.cons(change, tail: newTail))
+            tail = newTail
         }
-        return IArray(latest: latest, changes: changes, change: appendChange)
+        return (IArray(initial: initial, changes: changes), appendChange)
     }
+    
+    func filter<Element>(list: I<IList<Element>>, _ condition: @escaping (Element) -> Bool) -> I<IList<Element>> {
+        func recurse(list: I<IList<Element>>, destination: I<IList<Element>>) {
+            list.read { l in
+                switch l {
+                case .empty:
+                    destination.write(.empty)
+                case let .cons(el, tail: t):
+                    if condition(el) {
+                        let newTail: I<IList<Element>> = I(incremental: self)
+                        destination.write(.cons(el, tail: newTail))
+                        recurse(list: t, destination: newTail)
+                    } else {
+                        recurse(list: t, destination: destination)
+                    }
+                }
+            }
+        }
+        let dest: I<IList<Element>> = I(incremental: self)
+        recurse(list: list, destination: dest)
+        return dest
+    }
+    
+//    func filter<Element>(array: I<IArray<Element>>, condition: (Element) -> Bool) -> I<IArray<Element>> {
+//        let result: I<IArray<Element>> = I<IArray<Element>>(incremental: self)
+//        array.read { arr in
+//            result.write(IArray(initial: arr.initial.filter(condition), changes: filter(changes, lift(condition))))
+//        }
+//    }
 }
