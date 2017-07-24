@@ -127,10 +127,10 @@ func testReduce() {
     let reduced = inc.reduce(isEqual: ==, x, 0, tracedSum)
     reduced.read { print($0) }
     inc.propagate()
-
+    
     tail.write(.cons(4, tail: inc.constant(.empty)))
     inc.propagate()
-
+    
 }
 
 testReduce()
@@ -139,4 +139,6 @@ test2()
 testGui()
 testArray()
 testMinimal()
+
+
 
