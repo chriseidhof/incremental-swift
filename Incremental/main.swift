@@ -114,6 +114,8 @@ func test2() {
         print("sum: \($0)")
     }
     inc.propagate()
+    x.value = 6
+    inc.propagate()
 }
 
 test()
