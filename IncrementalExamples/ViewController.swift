@@ -18,8 +18,8 @@ class ViewController: UITableViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         backing = ["One", "Two", "Three", "Four"]
-        let iArray = inc.array(initial: backing)
-        change = iArray.change
+        let (iArray, change) = inc.array(initial: backing)
+        self.change = change
         let initialChanges: [ArrayChange<String>] = []
         let acc: ([String], [ArrayChange<String>]) = (backing, initialChanges)
         let comp: (([String], [ArrayChange<String>]), ([String], [ArrayChange<String>])) -> Bool = { $0.0 == $1.0 && $0.1 == $1.1 }
