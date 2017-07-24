@@ -118,6 +118,22 @@ func test2() {
     inc.propagate()
 }
 
+func testReduce() {
+    var (x, tail) = inc.list(from: [0,1,2,3])
+    func tracedSum(x: Int, y: Int) -> Int {
+        print("tracing sum: \((x, y))")
+        return x + y
+    }
+    let reduced = inc.reduce(isEqual: ==, x, 0, tracedSum)
+    reduced.read { print($0) }
+    inc.propagate()
+
+    tail.write(.cons(4, tail: inc.constant(.empty)))
+    inc.propagate()
+
+}
+
+testReduce()
 test()
 test2()
 testGui()
