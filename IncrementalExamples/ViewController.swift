@@ -18,15 +18,12 @@ class ViewController: UITableViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         backing = ["One", "Two", "Three", "Four"]
-        let (iArray, change) = inc.array(initial: backing)
+        let (arr, change) = inc.array(initial: backing)
         self.change = change
-        let initialChanges: [ArrayChange<String>] = []
-        let acc: ([String], [ArrayChange<String>]) = (backing, initialChanges)
-        let comp: (([String], [ArrayChange<String>]), ([String], [ArrayChange<String>])) -> Bool = { $0.0 == $1.0 && $0.1 == $1.1 }
         var processed: Int = 0
-        let signal: I<([String], [ArrayChange<String>])> = self.inc.reduce(isEqual: comp, iArray.changes, acc, { acc, change in
-            let new: [String] = acc.0.applying(change: change)
-            return (new, acc.1 + [change])
+        let filtered: IArray<String> = inc.filter(array: arr, condition: { $0.characters.count > 3 })
+        let signal: I<([String], [ArrayChange<String>])> = self.inc.reduce(isEqual: { $0.0 == $1.0 && $0.1 == $1.1 }, filtered.changes, (filtered.initial, []), { acc, change in
+            return (acc.0.applying(change: change), acc.1 + [change])
         })
         signal.read { (c, changes) in
             self.backing = c

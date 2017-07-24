@@ -20,7 +20,7 @@ struct Edge: Comparable, CustomDebugStringConvertible, CustomStringConvertible {
     
     static func <(lhs: Edge, rhs: Edge) -> Bool {
         if lhs.timeSpan.start < rhs.timeSpan.start { return true }
-        return rhs.timeSpan.start < rhs.timeSpan.start
+        return rhs.timeSpan.start > rhs.timeSpan.start
     }
     
     static func ==(lhs: Edge, rhs: Edge) -> Bool {
@@ -78,13 +78,17 @@ final class I<A> {
         }
         run()
     }
-    
-    func map<B>(_ transform: @escaping (A) -> B) -> I<B> where B: Equatable {
-        let result = I<B>(incremental: incremental)
+
+    func mapE<B>(_ isEqual: @escaping (B,B) -> Bool, _ transform: @escaping (A) -> B) -> I<B> {
+        let result = I<B>(incremental: incremental, isEqual: isEqual)
         read {
             result.write(transform($0))
         }
         return result
+    }
+
+    func map<B>(_ transform: @escaping (A) -> B) -> I<B> where B: Equatable {
+        return mapE(==, transform)
     }
     
     func flatMap<B>(_ transform: @escaping (A) -> I<B>) -> I<B> where B: Equatable {
@@ -97,14 +101,18 @@ final class I<A> {
         return result
     }
     
-    func zip<B,C>(_ r: I<B>, _ transform: @escaping (A, B) -> C) -> I<C> where C: Equatable {
-        let result = I<C>(incremental: incremental)
+    func zipE<B,C>(_ r: I<B>, _ isEqual: @escaping (C,C) -> Bool, _ transform: @escaping (A, B) -> C) -> I<C> {
+        let result = I<C>(incremental: incremental, isEqual: isEqual)
         read { value1 in
             r.read { value2 in
                 result.write(transform(value1, value2))
             }
         }
         return result
+    }
+    
+    func zip<B,C>(_ r: I<B>, _ transform: @escaping (A, B) -> C) -> I<C> where C: Equatable {
+        return zipE(r, ==, transform)
     }
 }
 
@@ -192,6 +200,7 @@ final class Incremental {
                 continue
             }
             clock.delete(between: edge.timeSpan.start, and: edge.timeSpan.end)
+            queue.remove(where: { $0.timeSpan.start > edge.timeSpan.start && $0.timeSpan.end <= edge.timeSpan.end})
             currentTime = edge.timeSpan.start
             edge.reader()
         }

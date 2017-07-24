@@ -133,12 +133,71 @@ func testReduce() {
     
 }
 
-testReduce()
-test()
-test2()
-testGui()
-testArray()
-testMinimal()
+struct Person: Equatable {
+    let name: String
+    let password: String
+
+    static func ==(lhs: Person, rhs: Person) -> Bool {
+        return lhs.name == rhs.name && lhs.password == rhs.password
+    }
+}
 
 
+func testValidation() {
+    let name = Var("")
+    let validName: I<String?> = inc.read(name).mapE(==) { $0.isEmpty ? nil : $0 }
+
+    let password = Var("a")
+    let passwordRepeat = Var("b")
+
+    let validPassword: I<String?> = inc.read(password).mapE(==) { $0.isEmpty ? nil : $0 }
+    let successPassword: I<String?> = validPassword.zipE(inc.read(passwordRepeat), ==, { p1, p2 in
+        //print("trace \(p1, p2, p1==p2)")
+        return p1 == p2 ? p1 : nil
+    })
+    
+//    let person: I<Person?> = validName.zipE(successPassword, ==) { oName, oPassword in
+//        guard let name = oName, let password = oPassword else { return nil }
+//        return Person(name: name, password: password)
+//    }
+    successPassword.read { p in
+        print("Person: \(p)")
+    }
+    inc.propagate()
+    password.value = "one"
+    passwordRepeat.value = "one"
+    inc.propagate()
+}
+
+func testArrayFilter() {
+    let (arr, change) = inc.array(initial: [0, 1, 2, 3, 4, 5])
+    let filtered = inc.filter(array: arr, condition: {
+        print("trace: \($0)")
+        return $0 % 2 == 0
+    })
+    filtered.latest.observe { i in
+        print("latest: \(i)")
+    }
+    arr.latest.read { print("original: \($0)")}
+    inc.propagate()
+    change(.append(6))
+    change(.append(7))
+    inc.propagate()
+}
+
+// Todo:
+// - IArray.sorted
+// - IArray[0..<n] - independent slices
+
+testArrayFilter()
+//testValidation()
+//testReduce()
+//test()
+//test2()
+//testGui()
+//testArray()
+//testMinimal()
+//
+//
+//
 

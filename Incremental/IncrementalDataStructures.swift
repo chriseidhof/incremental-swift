@@ -68,6 +68,12 @@ indirect enum IList<A: Equatable>: Equatable {
 struct IArray<Element: Equatable>: Equatable {
     let initial: [Element]
     let changes: I<IList<ArrayChange<Element>>>
+    
+    var latest: I<[Element]> {
+        return changes.incremental.reduce(isEqual: ==, changes, initial) { l, el in
+            l.applying(change: el)
+        }
+    }
 }
 
 func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
@@ -150,10 +156,37 @@ extension Incremental {
         return dest
     }
     
-//    func filter<Element>(array: I<IArray<Element>>, condition: (Element) -> Bool) -> I<IArray<Element>> {
-//        let result: I<IArray<Element>> = I<IArray<Element>>(incremental: self)
-//        array.read { arr in
-//            result.write(IArray(initial: arr.initial.filter(condition), changes: filter(changes, lift(condition))))
-//        }
-//    }
+    func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
+        var initial = array.initial.filter(condition)
+        
+        let filteredChanges: I<IList<ArrayChange<Element>>> = I(incremental: self, isEqual: ==)
+        func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
+            changes.read { switch $0 {
+            case .empty: destination.write(.empty)
+            case let .cons(change, tail: tail):
+                if let result = current.applying(change: change, for: condition) {
+                    let newTail: I<IList<ArrayChange<Element>>> = I.init(incremental: self, isEqual: ==)
+                    destination.write(.cons(change, tail: newTail))
+                    filterH(changes: tail, destination: newTail, current: result)
+                } else {
+                    filterH(changes: tail, destination: destination, current: current)
+                }
+            }}
+        }
+        filterH(changes: array.changes, destination: filteredChanges, current: initial)
+        return IArray(initial: initial, changes: filteredChanges)
+    }
+}
+
+extension Array where Element: Equatable {
+    func applying(change: ArrayChange<Element>, for condition: (Element) -> Bool) -> [Element]? {
+        switch change {
+        case .append(let x):
+            return condition(x) ? applying(change: change) : nil
+        case .insert(element: let el, at: _):
+            return condition(el) ? applying(change: change) : nil
+        case .remove(elementAt: let i):
+            return condition(self[i]) ? applying(change: change) : nil
+        }
+    }
 }
