@@ -199,20 +199,84 @@ func testArrayFilterSort() {
     Incremental.shared.propagate()
 }
 
+func simplestExample() {
+    let x = Var(5)
+    let y = Var(6)
+    let z = I<Int>()
+    let x1 = I(variable: x)
+    let y1 = I(variable: y)
+    
+    // At this point, x1 has time 10, y1 has time 20, and z does not have a time yet (because it isn't written to)
+    
+    x1.read { xVal in
+        // the current time is 30
+        y1.read { yVal in
+            // the current time is 40
+            // writing will set the time of z to a new, fresh time: 50
+            z.write(xVal + yVal)
+        }
+    }
+    
+    var observer: Any? = z.observe { x in print(x) } // this reader adds time 60
+    Incremental.shared.propagate() // nothing to propagate
+    
+    y.value = 11 // this adds y1's read block to the queue. the timespan of that block is 40-50
+    x.value = 10 // this adds x1's read block to the queue. x's read block has timespan 30-50
+    
+    // the queue contains two blocks: 30-50 and 40-50.
+    // The fact that the start time of the second block is within the timespan of the first block means that the second block is contained within the first block.
+    // The moment we process the first block, we can remove all other blocks
+    Incremental.shared.propagate()
+    observer = nil
+    x.value = 20
+    Incremental.shared.propagate()
+}
 
+func garbageCollectionSmall() {
+    let tmp = I<Int>()
+    tmp.write(5)
+    let out = I<Int>()
+    tmp.read {
+        out.write($0 + 1)
+    }
+    var x: Any? = tmp.observe { x in print(x) }
+    Incremental.shared.propagate()
+    print("done")
+}
+
+func garbageCollectionLarger() {
+    var (tmp, change) = Incremental.shared.array(initial: [0,1,2])
+    change(.append(3))
+    Incremental.shared.reduce(isEqual: { _, _ in true }, tmp.changes, (), { _, change in
+        print(change)
+        return ()
+    })
+    Incremental.shared.propagate()
+//    tmp.write(5)
+//    let out = I<Int>()
+//    tmp.read {
+//        out.write($0 + 1)
+//    }
+//    var x: Any? = tmp.observe { x in print(x) }
+//    Incremental.shared.propagate()
+    print("done")
+    
+}
+
+garbageCollectionLarger()
 // Todo:
 // - IArray.sorted
 // - IArray[0..<n] - independent slices
 
-testArrayFilterSort()
-testArrayFilter()
-testValidation()
-testReduce()
-test()
-test2()
-testGui()
-testArray()
-testMinimal()
+//testArrayFilterSort()
+//testArrayFilter()
+//testValidation()
+//testReduce()
+//test()
+//test2()
+//testGui()
+//testArray()
+//testMinimal()
 //
 //
 //

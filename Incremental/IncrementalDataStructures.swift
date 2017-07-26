@@ -81,12 +81,14 @@ func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
 }
 
 extension Incremental {
+    /// A constant list: you are only allowed to append (using the second result parameter)
     func list<S: Sequence, Element>(from sequence: S) -> (I<IList<Element>>, I<IList<Element>>) where S.Iterator.Element == Element, Element: Equatable {
-        let tail: I<IList<Element>> = I(.empty)
+        let tail: I<IList<Element>> = I()
         var result: I<IList<Element>> = tail
-        for item in sequence {
+        for item in sequence.reversed() {
             result = I(.cons(item, tail: result))
         }
+        tail.write(.empty)
         
         return (result, tail)
     }
@@ -108,7 +110,6 @@ extension Incremental {
     }
     
     func appending<Element>(list: I<IList<Element>>, element: Element) -> I<IList<Element>> {
-        var destination: I<IList<Element>> = I()
         func appendingH(list: I<IList<Element>>, dest: I<IList<Element>>) {
             list.read { switch $0 {
             case .empty:
@@ -119,6 +120,7 @@ extension Incremental {
                 dest.write(.cons(x, tail: newDestination))
             }}
         }
+        let destination: I<IList<Element>> = I()
         appendingH(list: list, dest: destination)
         return destination
     }
@@ -127,8 +129,9 @@ extension Incremental {
         let x: [ArrayChange<Element>] = []
         var (changes, tail) = list(from: x)
         func appendChange(change: ArrayChange<Element>) {
-            let newTail: I<IList<ArrayChange<Element>>> = I(.empty)
-            tail.write(.cons(change, tail: newTail))
+            let newTail: I<IList<ArrayChange<Element>>> = I()
+            newTail.write(.empty)
+            tail.write(constant: .cons(change, tail: newTail))
             tail = newTail
         }
         return (IArray(initial: initial, changes: changes), appendChange)
@@ -162,7 +165,8 @@ extension Incremental {
         let filteredChanges: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
         func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
             changes.read { switch $0 {
-            case .empty: destination.write(.empty)
+            case .empty:
+                destination.write(.empty)
             case let .cons(change, tail: tail):
                 if let result = current.applying(change: change, for: condition) {
                     let newTail: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
