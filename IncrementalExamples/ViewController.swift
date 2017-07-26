@@ -9,7 +9,6 @@
 import UIKit
 
 class ViewController: UITableViewController {
-    var inc = Incremental()
     var backing: [String] = []
     var change: ((ArrayChange<String>) -> ())!
     
@@ -18,23 +17,23 @@ class ViewController: UITableViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         backing = ["One", "Two", "Three", "Four"]
-        let (arr, change) = inc.array(initial: backing)
+        let (arr, change) = Incremental.shared.array(initial: backing)
         self.change = change
-        var processed: Int = 0
-        let filtered: IArray<String> = inc.filter(array: arr, condition: { $0.characters.count > 3 })
-        let signal: I<([String], [ArrayChange<String>])> = self.inc.reduce(isEqual: { $0.0 == $1.0 && $0.1 == $1.1 }, filtered.changes, (filtered.initial, []), { acc, change in
-            return (acc.0.applying(change: change), acc.1 + [change])
+        var pendingChanges: [ArrayChange<String>] = []
+        
+        let filtered: IArray<String> = Incremental.shared.filter(array: arr, condition: { $0.characters.count > 3 })
+        let signal: I<()> = Incremental.shared.reduce(isEqual: { _, _ in false }, filtered.changes, (), { _, change in
+            self.backing.apply(change: change)
+            pendingChanges.append(change)
         })
-        signal.read { (c, changes) in
-            self.backing = c
-            let newProcessed = changes.count
+        signal.read {
             self.tableView.beginUpdates()
-            for c in changes.dropFirst(processed) {
+            for c in pendingChanges {
                 self.animate(c)
                 print(c)
             }
+            pendingChanges = []
             self.tableView.endUpdates()
-            processed = newProcessed
         }
     }
     
@@ -64,7 +63,7 @@ class ViewController: UITableViewController {
     @IBAction func add(_ sender: Any) {
         change(.insert(element: "Hi", at: Int(arc4random()) % (backing.count)))
         change(.append("A Number"))
-        inc.propagate()
+        Incremental.shared.propagate()
     }
 }
 

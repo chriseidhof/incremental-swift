@@ -70,7 +70,7 @@ struct IArray<Element: Equatable>: Equatable {
     let changes: I<IList<ArrayChange<Element>>>
     
     var latest: I<[Element]> {
-        return changes.incremental.reduce(isEqual: ==, changes, initial) { l, el in
+        return Incremental.shared.reduce(isEqual: ==, changes, initial) { l, el in
             l.applying(change: el)
         }
     }
@@ -82,10 +82,10 @@ func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
 
 extension Incremental {
     func list<S: Sequence, Element>(from sequence: S) -> (I<IList<Element>>, I<IList<Element>>) where S.Iterator.Element == Element, Element: Equatable {
-        let tail: I<IList<Element>> = self.constant(.empty)
+        let tail: I<IList<Element>> = I(.empty)
         var result: I<IList<Element>> = tail
         for item in sequence {
-            result = self.constant(.cons(item, tail: result))
+            result = I(.cons(item, tail: result))
         }
         
         return (result, tail)
@@ -102,19 +102,19 @@ extension Incremental {
                 }
             }
         }
-        let destination: I<Result> = I(incremental: self, isEqual: isEqual)
+        let destination: I<Result> = I(isEqual: isEqual)
         reduceH(list, intermediate: initial, destination: destination)
         return destination
     }
     
     func appending<Element>(list: I<IList<Element>>, element: Element) -> I<IList<Element>> {
-        var destination: I<IList<Element>> = I(incremental: self)
+        var destination: I<IList<Element>> = I()
         func appendingH(list: I<IList<Element>>, dest: I<IList<Element>>) {
             list.read { switch $0 {
             case .empty:
-                dest.write(.cons(element, tail: self.constant(.empty)))
+                dest.write(.cons(element, tail: I(.empty)))
             case let .cons(x, tail: tail):
-                let newDestination: I<IList<Element>> = I(incremental: self)
+                let newDestination: I<IList<Element>> = I()
                 appendingH(list: tail, dest: newDestination)
                 dest.write(.cons(x, tail: newDestination))
             }}
@@ -127,7 +127,7 @@ extension Incremental {
         let x: [ArrayChange<Element>] = []
         var (changes, tail) = list(from: x)
         func appendChange(change: ArrayChange<Element>) {
-            let newTail: I<IList<ArrayChange<Element>>> = self.constant(.empty)
+            let newTail: I<IList<ArrayChange<Element>>> = I(.empty)
             tail.write(.cons(change, tail: newTail))
             tail = newTail
         }
@@ -142,7 +142,7 @@ extension Incremental {
                     destination.write(.empty)
                 case let .cons(el, tail: t):
                     if condition(el) {
-                        let newTail: I<IList<Element>> = I(incremental: self)
+                        let newTail: I<IList<Element>> = I()
                         destination.write(.cons(el, tail: newTail))
                         recurse(list: t, destination: newTail)
                     } else {
@@ -151,7 +151,7 @@ extension Incremental {
                 }
             }
         }
-        let dest: I<IList<Element>> = I(incremental: self)
+        let dest: I<IList<Element>> = I()
         recurse(list: list, destination: dest)
         return dest
     }
@@ -159,13 +159,13 @@ extension Incremental {
     func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
         var initial = array.initial.filter(condition)
         
-        let filteredChanges: I<IList<ArrayChange<Element>>> = I(incremental: self, isEqual: ==)
+        let filteredChanges: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
         func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
             changes.read { switch $0 {
             case .empty: destination.write(.empty)
             case let .cons(change, tail: tail):
                 if let result = current.applying(change: change, for: condition) {
-                    let newTail: I<IList<ArrayChange<Element>>> = I.init(incremental: self, isEqual: ==)
+                    let newTail: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
                     destination.write(.cons(change, tail: newTail))
                     filterH(changes: tail, destination: newTail, current: result)
                 } else {
@@ -175,6 +175,36 @@ extension Incremental {
         }
         filterH(changes: array.changes, destination: filteredChanges, current: initial)
         return IArray(initial: initial, changes: filteredChanges)
+    }
+    
+    func sort<Element>(array: IArray<Element>, _ sortDescriptor: @escaping (Element,Element) -> ComparisonResult) -> IArray<Element> {
+        let changes: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
+        func sortH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, array: [Element], current: SortedArray<Element>) {
+            var copy = current
+            changes.read { switch $0 {
+            case .empty: destination.write(.empty)
+            case let .cons(change, tail: tail):
+                let newTail: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
+                let newChange: ArrayChange<Element>
+                switch change {
+                case .append(let el):
+                    newChange = .insert(element: el, at: copy.insert(el))
+                case let .insert(element: element, at: _):
+                    newChange = .insert(element: element, at: copy.insert(element))
+                case .remove(elementAt: let i):
+                    let element = array[i]
+                    let index = copy.index(of: element)!
+                    _ = copy.remove(at: index)
+                    newChange = .remove(elementAt: index)
+                }
+                
+                destination.write(.cons(newChange, tail: newTail))
+                sortH(changes: tail, destination: newTail, array: array.applying(change: change), current: copy)
+            }}
+        }
+        let sorted = SortedArray(unsorted: array.initial, sortDescriptor: sortDescriptor)
+        sortH(changes: array.changes, destination: changes, array: array.initial, current: sorted)
+        return IArray(initial: sorted.elements, changes: changes)
     }
 }
 

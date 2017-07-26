@@ -32,39 +32,42 @@ struct Edge: Comparable, CustomDebugStringConvertible, CustomStringConvertible {
 }
 
 final class I<A> {
-    unowned var incremental: Incremental
     var outEdges: [Edge] = []
-    var value: (() -> A)?
+    var value: A!
     var time: T?
     let isEqual: (A, A) -> Bool
     
-    init(incremental: Incremental, isEqual: @escaping (A, A) -> Bool, value: (() -> A)? = nil) {
-        self.incremental = incremental
-        self.value = value
+    init(isEqual: @escaping (A, A) -> Bool) {
         self.isEqual = isEqual
+    }
+    
+    init(isEqual: @escaping (A, A) -> Bool, value: A) {
+        self.isEqual = isEqual
+        self.time = Incremental.shared.freshTimeAfterCurrent()
+        self.value = value
     }
     
     func write(_ newValue: A) {
         guard let time = time else { // initial write
-            value = { newValue }
-            self.time = incremental.freshTimeAfterCurrent()
+            value = newValue
+            self.time = Incremental.shared.freshTimeAfterCurrent()
             return
         }
         
-        if !isEqual(value!(), newValue) {
-            value = { newValue }
-            incremental.enqueue(edges: outEdges)
+        if !isEqual(value, newValue) {
+            value = newValue
+            Incremental.shared.enqueue(edges: outEdges)
             outEdges = []
         }
         
-        incremental.currentTime = time
+        Incremental.shared.currentTime = time
     }
     
     func read(_ reader: @escaping (A) -> ()) {
-        let start = incremental.freshTimeAfterCurrent()
+        let start = Incremental.shared.freshTimeAfterCurrent()
         func run() {
-            reader(value!())
-            let timespan = (start, incremental.currentTime)
+            reader(value)
+            let timespan = (start, Incremental.shared.currentTime)
             assert(timespan.0 <= timespan.1)
             outEdges.append(Edge(reader: run, timeSpan: timespan))
         }
@@ -73,14 +76,14 @@ final class I<A> {
     
     func observe(_ reader: @escaping (A) -> ()) {
         func run() {
-            reader(value!())
-            outEdges.append(Edge(reader: run, timeSpan: (start: incremental.currentTime, end: incremental.currentTime)))
+            reader(value)
+            outEdges.append(Edge(reader: run, timeSpan: (start: Incremental.shared.currentTime, end: Incremental.shared.currentTime)))
         }
         run()
     }
 
     func mapE<B>(_ isEqual: @escaping (B,B) -> Bool, _ transform: @escaping (A) -> B) -> I<B> {
-        let result = I<B>(incremental: incremental, isEqual: isEqual)
+        let result = I<B>(isEqual: isEqual)
         read {
             result.write(transform($0))
         }
@@ -92,7 +95,7 @@ final class I<A> {
     }
     
     func flatMap<B>(_ transform: @escaping (A) -> I<B>) -> I<B> where B: Equatable {
-        let result = I<B>(incremental: incremental)
+        let result = I<B>()
         read { value in
             transform(value).read { newValue in
                 result.write(newValue)
@@ -102,7 +105,7 @@ final class I<A> {
     }
     
     func zipE<B,C>(_ r: I<B>, _ isEqual: @escaping (C,C) -> Bool, _ transform: @escaping (A, B) -> C) -> I<C> {
-        let result = I<C>(incremental: incremental, isEqual: isEqual)
+        let result = I<C>(isEqual: isEqual)
         read { value1 in
             r.read { value2 in
                 result.write(transform(value1, value2))
@@ -123,9 +126,14 @@ extension I: Equatable {
 }
 
 extension I where A: Equatable {
-    convenience init(incremental: Incremental) {
-        self.init(incremental: incremental, isEqual: ==)
+    convenience init() {
+        self.init(isEqual: ==)
     }
+    
+    convenience init(_ value: A) {
+        self.init(isEqual: ==, value: value)
+    }
+
 }
 
 final class Var<A> {
@@ -163,8 +171,9 @@ final class Incremental {
     var clock = Clock()
     var currentTime: T
     var queue = SortedArray<Edge>(unsorted: [])
+    static let shared = Incremental()
     
-    init() {
+    private init() {
         currentTime = clock.initial
     }
     
@@ -177,14 +186,14 @@ final class Incremental {
         return currentTime
     }
     
-    func constant<A>(_ value: A) -> I<A> where A: Equatable {
-        let result = I<A>(incremental: self)
-        result.write(value)
-        return result
-    }
-    
+//    func constant<A>(_ value: A) -> I<A> where A: Equatable {
+//        let result = I<A>()
+//        result.write(value)
+//        return result
+//    }
+//    
     func read<A>(_ variable: Var<A>) -> I<A> where A: Equatable {
-        let result = I<A>(incremental: self)
+        let result = I<A>()
         variable.addObserver { newValue in // todo: should the variable strongly reference the result? probably not
             result.write(newValue)
         }

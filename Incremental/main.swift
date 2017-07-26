@@ -19,52 +19,48 @@ extension App: Equatable {
     }
 }
 
-let inc = Incremental()
-
-
 func if_<A: Equatable>(_ cond: I<Bool>, _ then: @autoclosure @escaping () -> I<A>, else alt:  @autoclosure @escaping () -> I<A>) -> I<A> {
     return cond.flatMap { $0 ? then() : alt() }
 }
 
 func testMinimal() {
     let start: [Int] = []
-    var (list, tail) = inc.list(from: start)
-    let reduced = inc.reduce(isEqual: ==, list, 0, +)
+    var (list, tail) = Incremental.shared.list(from: start)
+    let reduced = Incremental.shared.reduce(isEqual: ==, list, 0, +)
     reduced.observe {
         print($0)
     }
-    print("ct \(inc.currentTime)")
     for x in [0,1,2] {
-        let newTail: I<IList<Int>> = inc.constant(.empty)
+        let newTail: I<IList<Int>> = I(.empty)
         tail.write(.cons(x, tail: newTail))
         tail = newTail
-        inc.propagate()
+        Incremental.shared.propagate()
     }
 }
 
 func testArray() {
-    let (arr, change) = inc.array(initial: [] as [Int])
-    let latest: I<[Int]> = inc.reduce(isEqual: ==, arr.changes, arr.initial) { l, el in
+    let (arr, change) = Incremental.shared.array(initial: [] as [Int])
+    let latest: I<[Int]> = Incremental.shared.reduce(isEqual: ==, arr.changes, arr.initial) { l, el in
         l.applying(change: el)
     }
 
-    let size: I<String> = if_(latest.map { $0.count > 1 }, inc.constant("large"), else: inc.constant("small"))
+    let size: I<String> = if_(latest.map { $0.count > 1 }, I("large"), else: I("small"))
     size.observe {
         print($0)
     }
     change(.append(4))
-    inc.propagate()
+    Incremental.shared.propagate()
     change(.append(5))
     change(.insert(element: 0, at: 0))
-    inc.propagate()
+    Incremental.shared.propagate()
 }
 
 func testGui() {
     let counter = Var(0)
     let str = Var("Hi")
-    let app: Var<App> = Var(App.counter(x: inc.read(counter)))
-    let appI = inc.read(app)
-    let strI = inc.read(str)
+    let app: Var<App> = Var(App.counter(x: Incremental.shared.read(counter)))
+    let appI = Incremental.shared.read(app)
+    let strI = Incremental.shared.read(str)
 
     let gui: I<String> = appI.flatMap { a in
         print("evaluating flatMap")
@@ -82,54 +78,54 @@ func testGui() {
 
     counter.value += 1
 
-    inc.propagate()
+    Incremental.shared.propagate()
 
     print("propagated")
     app.value = .other(strI)
     counter.value = 3
 
-    inc.propagate()
+    Incremental.shared.propagate()
 }
 
 func test() {
     let x = Var(5)
     let y = Var(6)
-    let sum = inc.read(x).zip(inc.read(y), +)
+    let sum = Incremental.shared.read(x).zip(Incremental.shared.read(y), +)
     sum.read {
         print("result: \($0)")
     }
-    inc.propagate()
+    Incremental.shared.propagate()
     print("propagated")
     
     x.value = 10
     y.value = 20
-    inc.propagate()
+    Incremental.shared.propagate()
     print("Done")
 }
 
 func test2() {
     let x = Var(5)
-    let sum = inc.read(x).zip(inc.read(x), +)
+    let sum = Incremental.shared.read(x).zip(Incremental.shared.read(x), +)
     sum.read {
         print("sum: \($0)")
     }
-    inc.propagate()
+    Incremental.shared.propagate()
     x.value = 6
-    inc.propagate()
+    Incremental.shared.propagate()
 }
 
 func testReduce() {
-    var (x, tail) = inc.list(from: [0,1,2,3])
+    var (x, tail) = Incremental.shared.list(from: [0,1,2,3])
     func tracedSum(x: Int, y: Int) -> Int {
         print("tracing sum: \((x, y))")
         return x + y
     }
-    let reduced = inc.reduce(isEqual: ==, x, 0, tracedSum)
+    let reduced = Incremental.shared.reduce(isEqual: ==, x, 0, tracedSum)
     reduced.read { print($0) }
-    inc.propagate()
+    Incremental.shared.propagate()
     
-    tail.write(.cons(4, tail: inc.constant(.empty)))
-    inc.propagate()
+    tail.write(.cons(4, tail: I(.empty)))
+    Incremental.shared.propagate()
     
 }
 
@@ -145,13 +141,13 @@ struct Person: Equatable {
 
 func testValidation() {
     let name = Var("")
-    let validName: I<String?> = inc.read(name).mapE(==) { $0.isEmpty ? nil : $0 }
+    let validName: I<String?> = Incremental.shared.read(name).mapE(==) { $0.isEmpty ? nil : $0 }
 
     let password = Var("a")
     let passwordRepeat = Var("b")
 
-    let validPassword: I<String?> = inc.read(password).mapE(==) { $0.isEmpty ? nil : $0 }
-    let successPassword: I<String?> = validPassword.zipE(inc.read(passwordRepeat), ==, { p1, p2 in
+    let validPassword: I<String?> = Incremental.shared.read(password).mapE(==) { $0.isEmpty ? nil : $0 }
+    let successPassword: I<String?> = validPassword.zipE(Incremental.shared.read(passwordRepeat), ==, { p1, p2 in
         //print("trace \(p1, p2, p1==p2)")
         return p1 == p2 ? p1 : nil
     })
@@ -163,15 +159,15 @@ func testValidation() {
     successPassword.read { p in
         print("Person: \(p)")
     }
-    inc.propagate()
+    Incremental.shared.propagate()
     password.value = "one"
     passwordRepeat.value = "one"
-    inc.propagate()
+    Incremental.shared.propagate()
 }
 
 func testArrayFilter() {
-    let (arr, change) = inc.array(initial: [0, 1, 2, 3, 4, 5])
-    let filtered = inc.filter(array: arr, condition: {
+    let (arr, change) = Incremental.shared.array(initial: [0, 1, 2, 3, 4, 5])
+    let filtered = Incremental.shared.filter(array: arr, condition: {
         print("trace: \($0)")
         return $0 % 2 == 0
     })
@@ -179,24 +175,44 @@ func testArrayFilter() {
         print("latest: \(i)")
     }
     arr.latest.read { print("original: \($0)")}
-    inc.propagate()
+    Incremental.shared.propagate()
     change(.append(6))
     change(.append(7))
-    inc.propagate()
+    Incremental.shared.propagate()
 }
+
+
+func testArrayFilterSort() {
+    let (arr, change) = Incremental.shared.array(initial: ["xx", "zero", "one", "two", "three", "four"])
+    let filtered = Incremental.shared.filter(array: arr, condition: {
+        return $0.characters.count > 2
+    })
+    let sorted = Incremental.shared.sort(array: filtered, String.comparator)
+    sorted.latest.observe { i in
+        print("latest: \(i)")
+    }
+    arr.latest.read { print("original: \($0)")}
+    Incremental.shared.propagate()
+    change(.append("hello world"))
+    change(.append("x"))
+    change(.remove(elementAt: 0))
+    Incremental.shared.propagate()
+}
+
 
 // Todo:
 // - IArray.sorted
 // - IArray[0..<n] - independent slices
 
+testArrayFilterSort()
 testArrayFilter()
-//testValidation()
-//testReduce()
-//test()
-//test2()
-//testGui()
-//testArray()
-//testMinimal()
+testValidation()
+testReduce()
+test()
+test2()
+testGui()
+testArray()
+testMinimal()
 //
 //
 //

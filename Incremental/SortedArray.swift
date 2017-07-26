@@ -1,14 +1,13 @@
 import Foundation
 
-public struct SortedArray<Element: Comparable> {
+public struct SortedArray<Element> {
     public var elements: [Element]
+    public typealias SortDescriptor = (Element,Element) -> ComparisonResult
+    public let sortDescriptor: SortDescriptor
     
-    public init() {
-        self.elements = []
-    }
-    
-    public init<S: Sequence>(unsorted: S) where S.Iterator.Element == Element {
-        elements = unsorted.sorted()
+    public init<S: Sequence>(unsorted: S, sortDescriptor: @escaping SortDescriptor) where S.Iterator.Element == Element {
+        elements = unsorted.sorted(by: { sortDescriptor($0,$1) == .orderedAscending })
+        self.sortDescriptor = sortDescriptor
     }
     
     func index(for element: Element) -> Int {
@@ -16,7 +15,7 @@ public struct SortedArray<Element: Comparable> {
         var end = elements.endIndex
         while start < end {
             let middle = start + (end - start) / 2
-            if elements[middle] < element {
+            if sortDescriptor(elements[middle], element) == .orderedAscending {
                 start = middle + 1
             } else {
                 end = middle
@@ -47,7 +46,7 @@ public struct SortedArray<Element: Comparable> {
     
     public func index(of element: Element) -> Int? {
         let index = self.index(for: element)
-        guard index < elements.endIndex, elements[index] == element else { return nil }
+        guard index < elements.endIndex, sortDescriptor(elements[index], element) == .orderedSame else { return nil }
         return index
     }
     
@@ -58,6 +57,25 @@ public struct SortedArray<Element: Comparable> {
             }
         }
     }
+}
+
+extension Comparable {
+    static func comparator(_ l: Self, _ r: Self) -> ComparisonResult {
+        if l < r { return .orderedAscending }
+        if r < l { return .orderedDescending }
+        return .orderedSame
+    }
+}
+
+extension SortedArray where Element: Comparable {
+    public init() {
+        elements = []
+        sortDescriptor = Element.comparator
+    }
+    public init<S: Sequence>(unsorted: S) where S.Iterator.Element == Element {
+        self.init(unsorted: unsorted, sortDescriptor: Element.comparator)
+    }
+
 }
 
 extension SortedArray: Collection {
