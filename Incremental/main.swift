@@ -58,9 +58,9 @@ func testArray() {
 func testGui() {
     let counter = Var(0)
     let str = Var("Hi")
-    let app: Var<App> = Var(App.counter(x: Incremental.shared.read(counter)))
-    let appI = Incremental.shared.read(app)
-    let strI = Incremental.shared.read(str)
+    let app: Var<App> = Var(App.counter(x: I(variable: counter)))
+    let appI = I(variable: app)
+    let strI = I(variable: str)
 
     let gui: I<String> = appI.flatMap { a in
         print("evaluating flatMap")
@@ -90,7 +90,7 @@ func testGui() {
 func test() {
     let x = Var(5)
     let y = Var(6)
-    let sum = Incremental.shared.read(x).zip(Incremental.shared.read(y), +)
+    let sum = I(variable: x).zip(I(variable: y), +)
     sum.read {
         print("result: \($0)")
     }
@@ -105,7 +105,7 @@ func test() {
 
 func test2() {
     let x = Var(5)
-    let sum = Incremental.shared.read(x).zip(Incremental.shared.read(x), +)
+    let sum = I(variable: x).zip(I(variable: x), +)
     sum.read {
         print("sum: \($0)")
     }
@@ -141,13 +141,13 @@ struct Person: Equatable {
 
 func testValidation() {
     let name = Var("")
-    let validName: I<String?> = Incremental.shared.read(name).mapE(==) { $0.isEmpty ? nil : $0 }
+    let validName: I<String?> = I(variable: name).mapE(==) { $0.isEmpty ? nil : $0 }
 
     let password = Var("a")
     let passwordRepeat = Var("b")
 
-    let validPassword: I<String?> = Incremental.shared.read(password).mapE(==) { $0.isEmpty ? nil : $0 }
-    let successPassword: I<String?> = validPassword.zipE(Incremental.shared.read(passwordRepeat), ==, { p1, p2 in
+    let validPassword: I<String?> = I(variable: password).mapE(==) { $0.isEmpty ? nil : $0 }
+    let successPassword: I<String?> = validPassword.zipE(I(variable: passwordRepeat), ==, { p1, p2 in
         //print("trace \(p1, p2, p1==p2)")
         return p1 == p2 ? p1 : nil
     })

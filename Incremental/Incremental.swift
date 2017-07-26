@@ -133,6 +133,13 @@ extension I where A: Equatable {
     convenience init(_ value: A) {
         self.init(isEqual: ==, value: value)
     }
+    
+    convenience init(variable: Var<A>) {
+        self.init(variable.value)
+        variable.addObserver { [weak self] newValue in // todo: should the variable strongly reference the result? probably not
+            self?.write(newValue)
+        }
+    }
 
 }
 
@@ -184,21 +191,6 @@ final class Incremental {
     fileprivate func freshTimeAfterCurrent() -> T {
         currentTime = clock.insert(after: currentTime)
         return currentTime
-    }
-    
-//    func constant<A>(_ value: A) -> I<A> where A: Equatable {
-//        let result = I<A>()
-//        result.write(value)
-//        return result
-//    }
-//    
-    func read<A>(_ variable: Var<A>) -> I<A> where A: Equatable {
-        let result = I<A>()
-        variable.addObserver { newValue in // todo: should the variable strongly reference the result? probably not
-            result.write(newValue)
-        }
-        result.write(variable.value)
-        return result
     }
     
     func propagate() {
