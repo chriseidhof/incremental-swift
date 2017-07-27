@@ -160,6 +160,7 @@ extension Incremental {
         return dest
     }
     
+    // Todo abstract out the duplication between `filter` and `sort`.
     func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
         var initial = array.initial.filter(condition)
         

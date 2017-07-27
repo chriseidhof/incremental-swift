@@ -71,6 +71,7 @@ struct TreeImage: Equatable {
     let image: UIImage
     let rootMidX: CGFloat
 }
+
 func ==(lhs: TreeImage, rhs: TreeImage) -> Bool {
     return lhs.rootMidX == rhs.rootMidX && lhs.image == rhs.image
 }
@@ -285,25 +286,6 @@ class ViewController: UIViewController {
         for _ in 0..<100 {
             tree.insert(Int(arc4random() % 100))
         }
-
-//        observer = _render(tree: tree).observe { [unowned self] image in
-//            self.imageView.image = image?.image
-//        }
-
-//        let inOrder: I<[Int]> = reduceWith(isEqual: ==, tree, empty: [], combine: { x, l, r in
-//            l + [x] + r
-//        })
-//        observer = inOrder.observe { sum in
-//            print(sum)
-//        }
-
-//        var tree = BinaryTree<Int>.empty
-//        for x in (0..<10) {
-//            tree.insert(x)
-//        }
-//
-//        imageView.image = tree.render()
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -313,4 +295,3 @@ class ViewController: UIViewController {
 
 
 }
-

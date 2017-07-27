@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13156.6" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3eP-gi-3xr">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13168.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3eP-gi-3xr">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13137.5"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -22,7 +22,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="xWQ-Lx-Sue">
-                        <barButtonItem key="rightBarButtonItem" title="Add" id="Zcc-GW-T6R">
+                        <barButtonItem key="leftBarButtonItem" title="Show Stack View" id="UiG-1r-9hs">
+                            <connections>
+                                <action selector="showStackView:" destination="KQ5-mj-qgH" id="Srs-TH-gTs"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Zcc-GW-T6R">
                             <connections>
                                 <action selector="add:" destination="KQ5-mj-qgH" id="sCk-de-Ubg"/>
                             </connections>
