@@ -86,7 +86,7 @@ extension Incremental {
         let tail: I<IList<Element>> = I()
         var result: I<IList<Element>> = tail
         for item in sequence.reversed() {
-            result = I(.cons(item, tail: result))
+            result = I(constant: .cons(item, tail: result))
         }
         tail.write(.empty)
         
@@ -113,7 +113,8 @@ extension Incremental {
         func appendingH(list: I<IList<Element>>, dest: I<IList<Element>>) {
             list.read { switch $0 {
             case .empty:
-                dest.write(.cons(element, tail: I(.empty)))
+                let tail = I<IList<Element>>(value: IList.empty)
+                dest.write(IList<Element>.cons(element, tail: tail))
             case let .cons(x, tail: tail):
                 let newDestination: I<IList<Element>> = I()
                 appendingH(list: tail, dest: newDestination)

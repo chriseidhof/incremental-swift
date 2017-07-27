@@ -11,7 +11,7 @@ import Foundation
 // Todo: in reactive libraries, this would be called an observer...
 final class Edge: Comparable, CustomDebugStringConvertible, CustomStringConvertible {
     var debugDescription: String {
-        return "Edge<\(timeSpan)>"
+        return "Edge<\(timeSpan), defined at \(file):\(line), source: \(source)>"
     }
     
     var description: String {
@@ -20,7 +20,7 @@ final class Edge: Comparable, CustomDebugStringConvertible, CustomStringConverti
     
     static func <(lhs: Edge, rhs: Edge) -> Bool {
         if lhs.timeSpan.start < rhs.timeSpan.start { return true }
-        return rhs.timeSpan.start > rhs.timeSpan.start
+        return rhs.timeSpan.end > rhs.timeSpan.end
     }
     
     static func ==(lhs: Edge, rhs: Edge) -> Bool {
@@ -29,11 +29,21 @@ final class Edge: Comparable, CustomDebugStringConvertible, CustomStringConverti
     
     let reader: () -> ()
     let timeSpan: (start: T, end: T)
+    let line: UInt
+    let file: StaticString
+    weak var source: AnyObject?
     
-    init(reader: @escaping () -> (), timeSpan: (start: T, end: T)) {
+    init(reader: @escaping () -> (), timeSpan: (start: T, end: T), line: UInt, file: StaticString, source: AnyObject?) {
         self.reader = reader
         self.timeSpan = timeSpan
+        self.line = line
+        self.file = file
+        self.source = source
 //        print("initing edge \(timeSpan)")
+    }
+    
+    var isObserver: Bool {
+        return timeSpan.start == timeSpan.end
     }
     
     deinit {
@@ -68,18 +78,24 @@ final class I<A>: AnyI {
     private var cleanup: [() -> ()] = []
     
     init(isEqual: @escaping (A, A) -> Bool, line: UInt = #line) {
-        print("initing i [\(line)]")
+//        print("initing i [\(line)]")
         self.isEqual = isEqual
         self.line = line
     }
     
     init(constant: A, line: UInt = #line) {
-        print("initing \(line)")
+//        print("initing \(line)")
         self.isEqual = { _, _ in false }
         self.line = line
-        self.write(constant: value)
+        self.write(constant: constant)
     }
     
+    init(isEqual: @escaping (A, A) -> Bool, value: A, line: UInt = #line) {
+//        print("initing \(line)")
+        self.line = line
+        self.isEqual = isEqual
+        self.write(value)
+    }
 
     func write(constant: A) {
         write(constant)
@@ -113,27 +129,34 @@ final class I<A>: AnyI {
         var run: () -> () = { fatalError() }
         run = { [unowned self] in
             assert(self.value != nil, "Read before write", file: file, line: line)
-            Incremental.shared.reading(self) {
+            //Incremental.shared.reading(self) {
                 reader(self.value)
-            }
+//            }
             let timespan = (start, Incremental.shared.currentTime)
+            #if false
             if timespan.0 == timespan.1 {
                 assertionFailure("You're using read to observe side-effects, use `observe` instead.", file: file, line: line)
             }
+            #endif
             assert(timespan.0 <= timespan.1)
-            self.outEdges.append(Edge(reader: run, timeSpan: timespan))
+            let newEdge = Edge(reader: run, timeSpan: timespan, line: line, file: file, source: self)
+            if let index = self.outEdges.index(where: { $0.timeSpan.start == timespan.0 && $0.timeSpan.end == timespan.1 }) {
+                self.outEdges.remove(at: index)
+            }
+            //assert(!self.outEdges.contains(where: ), "Double edge with same timespan \(newEdge)")
+            self.outEdges.append(newEdge)
         }
         cleanup.append { run = { fatalError() }} // run has a reference to the reader, we need to get rid of that
         run()
     }
     
-    func observe(_ reader: @escaping (A) -> ()) -> Disposable {
-        var start: T!
+    func observe(line: UInt = #line, file: StaticString = #file, _ reader: @escaping (A) -> ()) -> Disposable {
+        var start: T! = Incremental.shared.currentTime
         func run() {
-            start = Incremental.shared.freshTimeAfterCurrent()
+            //start = Incremental.shared.freshTimeAfterCurrent()
             reader(value)
             assert(Incremental.shared.currentTime == start, "You're changing the graph in an observer. Use `read` or `write` instead.")
-            outEdges.append(Edge(reader: run, timeSpan: (start: start, end: start)))
+            outEdges.append(Edge(reader: run, timeSpan: (start: start, end: start), line: line, file: file, source: self))
         }
         run()
         return Disposable { [unowned self] in
@@ -187,7 +210,7 @@ final class I<A>: AnyI {
     
     deinit {
         cleanup.forEach { $0() }
-        print("Deiniting \(self) [\(line)]")
+//        print("Deiniting \(self) [\(line)]")
     }
 }
 
@@ -201,17 +224,18 @@ extension I where A: Equatable {
     convenience init(line: UInt = #line) {
         self.init(isEqual: ==, line: line)
     }
-    
-    convenience init(_ constant: A, line: UInt = #line) {
-        self.init(constant: constant, line: line)
-    }
-    
+        
     convenience init(variable: Var<A>, line: UInt = #line) {
-        self.init(variable.value, line: line)
+        self.init(value: variable.value, line: line)
         variable.addObserver { [weak self] newValue in
             self?.write(newValue)
         }
     }
+    
+    convenience init(value: A, line: UInt = #line) {
+        self.init(isEqual: ==, value: value, line: line)
+    }
+
 
 }
 
@@ -286,6 +310,7 @@ final class Incremental {
             guard clock.contains(t: edge.timeSpan.start) else {
                 continue
             }
+            assert(!queue.contains(where: { $0.timeSpan.start == edge.timeSpan.start && $0.timeSpan.end == edge.timeSpan.end && !$0.isObserver }), "Double edge: \(edge)")
             clock.delete(between: edge.timeSpan.start, and: edge.timeSpan.end)
             queue.remove(where: { $0.timeSpan.start > edge.timeSpan.start && $0.timeSpan.start < edge.timeSpan.end})
             currentTime = edge.timeSpan.start

@@ -27,11 +27,11 @@ func testMinimal() {
     let start: [Int] = []
     var (list, tail) = Incremental.shared.list(from: start)
     let reduced = Incremental.shared.reduce(isEqual: ==, list, 0, +)
-    reduced.observe {
+    let observer = reduced.observe {
         print($0)
     }
     for x in [0,1,2] {
-        let newTail: I<IList<Int>> = I(.empty)
+        let newTail: I<IList<Int>> = I(value: .empty)
         tail.write(.cons(x, tail: newTail))
         tail = newTail
         Incremental.shared.propagate()
@@ -44,8 +44,8 @@ func testArray() {
         l.applying(change: el)
     }
 
-    let size: I<String> = if_(latest.map { $0.count > 1 }, I("large"), else: I("small"))
-    size.observe {
+    let size: I<String> = if_(latest.map { $0.count > 1 }, I(constant: "large"), else: I(constant: "small"))
+    let observer = size.observe {
         print($0)
     }
     change(.append(4))
@@ -72,7 +72,7 @@ func testGui() {
         }
     }
 
-    gui.read {
+    let observer = gui.observe {
         print($0)
     }
 
@@ -91,7 +91,7 @@ func test() {
     let x = Var(5)
     let y = Var(6)
     let sum = I(variable: x).zip(I(variable: y), +)
-    sum.read {
+    let observer = sum.observe {
         print("result: \($0)")
     }
     Incremental.shared.propagate()
@@ -106,7 +106,7 @@ func test() {
 func test2() {
     let x = Var(5)
     let sum = I(variable: x).zip(I(variable: x), +)
-    sum.read {
+    let observer = sum.observe {
         print("sum: \($0)")
     }
     Incremental.shared.propagate()
@@ -121,10 +121,10 @@ func testReduce() {
         return x + y
     }
     let reduced = Incremental.shared.reduce(isEqual: ==, x, 0, tracedSum)
-    reduced.read { print($0) }
+    let observer = reduced.observe { print($0) }
     Incremental.shared.propagate()
     
-    tail.write(.cons(4, tail: I(.empty)))
+    tail.write(.cons(4, tail: I(value: .empty)))
     Incremental.shared.propagate()
     
 }
@@ -156,7 +156,7 @@ func testValidation() {
 //        guard let name = oName, let password = oPassword else { return nil }
 //        return Person(name: name, password: password)
 //    }
-    successPassword.read { p in
+    let observer = successPassword.observe { p in
         print("Person: \(p)")
     }
     Incremental.shared.propagate()
@@ -174,7 +174,7 @@ func testArrayFilter() {
     filtered.latest.observe { i in
         print("latest: \(i)")
     }
-    arr.latest.read { print("original: \($0)")}
+    let x = arr.latest.observe { print("original: \($0)")}
     Incremental.shared.propagate()
     change(.append(6))
     change(.append(7))
@@ -191,7 +191,7 @@ func testArrayFilterSort() {
     sorted.latest.observe { i in
         print("latest: \(i)")
     }
-    arr.latest.read { print("original: \($0)")}
+    arr.latest.observe { print("original: \($0)")}
     Incremental.shared.propagate()
     change(.append("hello world"))
     change(.append("x"))
@@ -263,11 +263,30 @@ func garbageCollectionLarger() {
     
 }
 
-garbageCollectionLarger()
-// Todo:
-// - IArray.sorted
-// - IArray[0..<n] - independent slices
 
+func binaryTreeExample() {
+    let x: I<IBinaryTree<Int>> = I(value: .empty)
+//    let inOrder: I<[Int]> = reduceWith(isEqual: ==, x, empty: [], combine: { (value: Int, l: [Int], r: [Int]) in
+//        print("combining \(l) \(value) and \(r)")
+//        return l + [value] + r
+//    })
+//    let observer1 = inOrder.observe {
+//        assert($0.sorted() == $0)
+//        print($0)
+//    }
+    let binaryTree: I<BinaryTree<Int>> = reduceWith(isEqual: ==, x, empty: .empty, combine: { v, l, r in
+        return .node(v, left: l, right: r)
+    })
+    let observer2 = binaryTree.observe { value in print(value) }
+    for value in [8,5,6,7,3,2,3] {
+        unsafeInsert(x, value)
+        Incremental.shared.propagate()
+    }
+}
+
+binaryTreeExample()
+//garbageCollectionLarger()
+//
 //testArrayFilterSort()
 //testArrayFilter()
 //testValidation()
@@ -280,4 +299,8 @@ garbageCollectionLarger()
 //
 //
 //
+
+//Todo:
+//- IArray.sorted
+//- IArray[0..<n] - independent slices
 

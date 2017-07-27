@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		832066D81F28F6B900965174 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832066D71F28F6B900965174 /* AppDelegate.swift */; };
+		832066DA1F28F6B900965174 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832066D91F28F6B900965174 /* ViewController.swift */; };
+		832066DD1F28F6B900965174 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 832066DB1F28F6B900965174 /* Main.storyboard */; };
+		832066DF1F28F6B900965174 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 832066DE1F28F6B900965174 /* Assets.xcassets */; };
+		832066E21F28F6B900965174 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 832066E01F28F6B900965174 /* LaunchScreen.storyboard */; };
+		833C25361F29CD4900B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
+		833C25371F29D05D00B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
+		833C25381F29D05D00B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
 		839A14141F247A9500C49C81 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14131F247A9500C49C81 /* AppDelegate.swift */; };
 		839A14161F247A9500C49C81 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14151F247A9500C49C81 /* ViewController.swift */; };
 		839A14191F247A9500C49C81 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 839A14171F247A9500C49C81 /* Main.storyboard */; };
@@ -19,6 +27,10 @@
 		839A14291F247B9E00C49C81 /* Incremental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14231F247ACF00C49C81 /* Incremental.swift */; };
 		839A142A1F247B9E00C49C81 /* IncrementalDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */; };
 		839A142C1F247BAF00C49C81 /* TableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A142B1F247BAF00C49C81 /* TableVC.swift */; };
+		83BCD6021F28F8680069F15D /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC31F237038004A6953 /* Clock.swift */; };
+		83BCD6031F28F8680069F15D /* SortedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC51F237047004A6953 /* SortedArray.swift */; };
+		83BCD6041F28F8680069F15D /* Incremental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14231F247ACF00C49C81 /* Incremental.swift */; };
+		83BCD6051F28F8680069F15D /* IncrementalDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */; };
 		83FC7CBD1F236800004A6953 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CBC1F236800004A6953 /* main.swift */; };
 		83FC7CC41F237038004A6953 /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC31F237038004A6953 /* Clock.swift */; };
 		83FC7CC61F237047004A6953 /* SortedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC51F237047004A6953 /* SortedArray.swift */; };
@@ -37,6 +49,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		832066D51F28F6B800965174 /* IncrementalTrees.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IncrementalTrees.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		832066D71F28F6B900965174 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		832066D91F28F6B900965174 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		832066DC1F28F6B900965174 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		832066DE1F28F6B900965174 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		832066E11F28F6B900965174 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		832066E31F28F6B900965174 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		833C25351F29CD4900B4A29D /* BinaryTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryTree.swift; sourceTree = "<group>"; };
 		839A14111F247A9500C49C81 /* IncrementalExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IncrementalExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		839A14131F247A9500C49C81 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		839A14151F247A9500C49C81 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -54,6 +74,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		832066D21F28F6B800965174 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		839A140E1F247A9500C49C81 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -71,6 +98,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		832066D61F28F6B900965174 /* IncrementalTrees */ = {
+			isa = PBXGroup;
+			children = (
+				832066D71F28F6B900965174 /* AppDelegate.swift */,
+				832066D91F28F6B900965174 /* ViewController.swift */,
+				832066DB1F28F6B900965174 /* Main.storyboard */,
+				832066DE1F28F6B900965174 /* Assets.xcassets */,
+				832066E01F28F6B900965174 /* LaunchScreen.storyboard */,
+				832066E31F28F6B900965174 /* Info.plist */,
+			);
+			path = IncrementalTrees;
+			sourceTree = "<group>";
+		};
 		839A14121F247A9500C49C81 /* IncrementalExamples */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,6 +130,7 @@
 			children = (
 				83FC7CBB1F236800004A6953 /* Incremental */,
 				839A14121F247A9500C49C81 /* IncrementalExamples */,
+				832066D61F28F6B900965174 /* IncrementalTrees */,
 				83FC7CBA1F236800004A6953 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,6 +140,7 @@
 			children = (
 				83FC7CB91F236800004A6953 /* Incremental */,
 				839A14111F247A9500C49C81 /* IncrementalExamples.app */,
+				832066D51F28F6B800965174 /* IncrementalTrees.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -111,6 +153,7 @@
 				83FC7CC51F237047004A6953 /* SortedArray.swift */,
 				839A14231F247ACF00C49C81 /* Incremental.swift */,
 				839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */,
+				833C25351F29CD4900B4A29D /* BinaryTree.swift */,
 			);
 			path = Incremental;
 			sourceTree = "<group>";
@@ -118,6 +161,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		832066D41F28F6B800965174 /* IncrementalTrees */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 832066E61F28F6B900965174 /* Build configuration list for PBXNativeTarget "IncrementalTrees" */;
+			buildPhases = (
+				832066D11F28F6B800965174 /* Sources */,
+				832066D21F28F6B800965174 /* Frameworks */,
+				832066D31F28F6B800965174 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IncrementalTrees;
+			productName = IncrementalTrees;
+			productReference = 832066D51F28F6B800965174 /* IncrementalTrees.app */;
+			productType = "com.apple.product-type.application";
+		};
 		839A14101F247A9500C49C81 /* IncrementalExamples */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 839A14221F247A9500C49C81 /* Build configuration list for PBXNativeTarget "IncrementalExamples" */;
@@ -162,6 +222,9 @@
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = objc.io;
 				TargetAttributes = {
+					832066D41F28F6B800965174 = {
+						CreatedOnToolsVersion = 9.0;
+					};
 					839A14101F247A9500C49C81 = {
 						CreatedOnToolsVersion = 9.0;
 					};
@@ -185,11 +248,22 @@
 			targets = (
 				83FC7CB81F236800004A6953 /* Incremental */,
 				839A14101F247A9500C49C81 /* IncrementalExamples */,
+				832066D41F28F6B800965174 /* IncrementalTrees */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		832066D31F28F6B800965174 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				832066E21F28F6B900965174 /* LaunchScreen.storyboard in Resources */,
+				832066DF1F28F6B900965174 /* Assets.xcassets in Resources */,
+				832066DD1F28F6B900965174 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		839A140F1F247A9500C49C81 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -203,10 +277,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		832066D11F28F6B800965174 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83BCD6051F28F8680069F15D /* IncrementalDataStructures.swift in Sources */,
+				833C25381F29D05D00B4A29D /* BinaryTree.swift in Sources */,
+				83BCD6041F28F8680069F15D /* Incremental.swift in Sources */,
+				83BCD6031F28F8680069F15D /* SortedArray.swift in Sources */,
+				83BCD6021F28F8680069F15D /* Clock.swift in Sources */,
+				832066DA1F28F6B900965174 /* ViewController.swift in Sources */,
+				832066D81F28F6B900965174 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		839A140D1F247A9500C49C81 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				833C25371F29D05D00B4A29D /* BinaryTree.swift in Sources */,
 				839A142A1F247B9E00C49C81 /* IncrementalDataStructures.swift in Sources */,
 				839A14291F247B9E00C49C81 /* Incremental.swift in Sources */,
 				839A14281F247B9E00C49C81 /* SortedArray.swift in Sources */,
@@ -223,6 +312,7 @@
 			files = (
 				83FC7CC41F237038004A6953 /* Clock.swift in Sources */,
 				83FC7CC61F237047004A6953 /* SortedArray.swift in Sources */,
+				833C25361F29CD4900B4A29D /* BinaryTree.swift in Sources */,
 				839A14261F247B0500C49C81 /* IncrementalDataStructures.swift in Sources */,
 				839A14241F247ACF00C49C81 /* Incremental.swift in Sources */,
 				83FC7CBD1F236800004A6953 /* main.swift in Sources */,
@@ -232,6 +322,22 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		832066DB1F28F6B900965174 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				832066DC1F28F6B900965174 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		832066E01F28F6B900965174 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				832066E11F28F6B900965174 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		839A14171F247A9500C49C81 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -251,6 +357,41 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		832066E41F28F6B900965174 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 58PSC9526Y;
+				INFOPLIST_FILE = IncrementalTrees/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.objcio.IncrementalTrees;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		832066E51F28F6B900965174 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 58PSC9526Y;
+				INFOPLIST_FILE = IncrementalTrees/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.objcio.IncrementalTrees;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		839A14201F247A9500C49C81 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -413,6 +554,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		832066E61F28F6B900965174 /* Build configuration list for PBXNativeTarget "IncrementalTrees" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				832066E41F28F6B900965174 /* Debug */,
+				832066E51F28F6B900965174 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		839A14221F247A9500C49C81 /* Build configuration list for PBXNativeTarget "IncrementalExamples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
