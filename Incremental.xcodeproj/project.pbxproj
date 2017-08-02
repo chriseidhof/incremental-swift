@@ -67,7 +67,7 @@
 		839A14231F247ACF00C49C81 /* Incremental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Incremental.swift; sourceTree = "<group>"; };
 		839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncrementalDataStructures.swift; sourceTree = "<group>"; };
 		839A142B1F247BAF00C49C81 /* TableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableVC.swift; sourceTree = "<group>"; };
-		83FC7CB91F236800004A6953 /* Incremental */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Incremental; sourceTree = BUILT_PRODUCTS_DIR; };
+		83FC7CB91F236800004A6953 /* IncrementalCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = IncrementalCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		83FC7CBC1F236800004A6953 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		83FC7CC31F237038004A6953 /* Clock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clock.swift; sourceTree = "<group>"; };
 		83FC7CC51F237047004A6953 /* SortedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortedArray.swift; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 		83FC7CB01F236800004A6953 = {
 			isa = PBXGroup;
 			children = (
-				83FC7CBB1F236800004A6953 /* Incremental */,
+				83FC7CBB1F236800004A6953 /* IncrementalCLI */,
 				839A14121F247A9500C49C81 /* IncrementalExamples */,
 				832066D61F28F6B900965174 /* IncrementalTrees */,
 				83FC7CBA1F236800004A6953 /* Products */,
@@ -138,14 +138,14 @@
 		83FC7CBA1F236800004A6953 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				83FC7CB91F236800004A6953 /* Incremental */,
+				83FC7CB91F236800004A6953 /* IncrementalCLI */,
 				839A14111F247A9500C49C81 /* IncrementalExamples.app */,
 				832066D51F28F6B800965174 /* IncrementalTrees.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		83FC7CBB1F236800004A6953 /* Incremental */ = {
+		83FC7CBB1F236800004A6953 /* IncrementalCLI */ = {
 			isa = PBXGroup;
 			children = (
 				83FC7CBC1F236800004A6953 /* main.swift */,
@@ -155,7 +155,7 @@
 				839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */,
 				833C25351F29CD4900B4A29D /* BinaryTree.swift */,
 			);
-			path = Incremental;
+			path = IncrementalCLI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,9 +195,9 @@
 			productReference = 839A14111F247A9500C49C81 /* IncrementalExamples.app */;
 			productType = "com.apple.product-type.application";
 		};
-		83FC7CB81F236800004A6953 /* Incremental */ = {
+		83FC7CB81F236800004A6953 /* IncrementalCLI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83FC7CC01F236800004A6953 /* Build configuration list for PBXNativeTarget "Incremental" */;
+			buildConfigurationList = 83FC7CC01F236800004A6953 /* Build configuration list for PBXNativeTarget "IncrementalCLI" */;
 			buildPhases = (
 				83FC7CB51F236800004A6953 /* Sources */,
 				83FC7CB61F236800004A6953 /* Frameworks */,
@@ -207,9 +207,9 @@
 			);
 			dependencies = (
 			);
-			name = Incremental;
+			name = IncrementalCLI;
 			productName = Incremental;
-			productReference = 83FC7CB91F236800004A6953 /* Incremental */;
+			productReference = 83FC7CB91F236800004A6953 /* IncrementalCLI */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -246,7 +246,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83FC7CB81F236800004A6953 /* Incremental */,
+				83FC7CB81F236800004A6953 /* IncrementalCLI */,
 				839A14101F247A9500C49C81 /* IncrementalExamples */,
 				832066D41F28F6B800965174 /* IncrementalTrees */,
 			);
@@ -573,7 +573,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83FC7CC01F236800004A6953 /* Build configuration list for PBXNativeTarget "Incremental" */ = {
+		83FC7CC01F236800004A6953 /* Build configuration list for PBXNativeTarget "IncrementalCLI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83FC7CC11F236800004A6953 /* Debug */,

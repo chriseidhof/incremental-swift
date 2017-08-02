@@ -12,7 +12,7 @@ final class StackViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
     func randomChange() {
     }
 }

@@ -65,7 +65,7 @@ class ViewController: UITableViewController {
         change(.append("A Number"))
         Incremental.shared.propagate()
     }
-
+    
     @IBAction func showStackView(_ sender: Any) {        navigationController?.pushViewController(UIViewController(), animated: true)
     }
 }
