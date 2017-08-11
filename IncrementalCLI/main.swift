@@ -188,7 +188,7 @@ func testArrayFilterSort() {
         return $0.characters.count > 2
     })
     let sorted = Incremental.shared.sort(array: filtered, String.comparator)
-    sorted.latest.observe { i in
+    let observer = sorted.latest.observe { i in
         print("latest: \(i)")
     }
     arr.latest.observe { print("original: \($0)")}
