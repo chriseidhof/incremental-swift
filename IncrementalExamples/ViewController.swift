@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UITableViewController {
     var backing: [String] = []
     var change: ((ArrayChange<String>) -> ())!
+    var observer: Any? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +27,7 @@ class ViewController: UITableViewController {
             self.backing.apply(change: change)
             pendingChanges.append(change)
         })
-        signal.read {
+        observer = signal.observe {
             self.tableView.beginUpdates()
             for c in pendingChanges {
                 self.animate(c)

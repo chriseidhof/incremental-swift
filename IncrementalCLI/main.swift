@@ -23,6 +23,20 @@ func if_<A: Equatable>(_ cond: I<Bool>, _ then: @autoclosure @escaping () -> I<A
     return cond.flatMap { $0 ? then() : alt() }
 }
 
+func testSum() {
+    let x = Var(5)
+    let y = Var(10)
+    let sum = I(variable: x).zip(I(variable: y), +)
+    let disposable = sum.observe { print($0) }
+    x.value = 6
+    x.value = 17
+    x.value = 10
+    Incremental.shared.propagate()
+    x.value = 20
+    Incremental.shared.propagate()
+}
+//testSum()
+
 func testMinimal() {
     let start: [Int] = []
     var (list, tail) = Incremental.shared.list(from: start)
@@ -48,11 +62,22 @@ func testArray() {
     let observer = size.observe {
         print($0)
     }
+    print("---")
     change(.append(4))
     Incremental.shared.propagate()
     change(.append(5))
     change(.insert(element: 0, at: 0))
     Incremental.shared.propagate()
+    change(.remove(elementAt: 0))
+    change(.remove(elementAt: 0))
+//    change(.remove(elementAt: 0))
+    Incremental.shared.propagate()
+}
+//testArray()
+
+enum MyApp {
+    case loginScreen
+    case product(productId: Int)
 }
 
 func testGui() {
@@ -86,33 +111,30 @@ func testGui() {
 
     Incremental.shared.propagate()
 }
+//testGui()
 
 func test() {
     let x = Var(5)
     let y = Var(6)
-    let sum = I(variable: x).zip(I(variable: y), +)
-    let observer = sum.observe {
+    let y1 = I(variable: y)
+    var sum: I<Int>! = I(variable: x).zip(y1, +)
+    var observer: Any? = sum.observe {
         print("result: \($0)")
     }
     Incremental.shared.propagate()
-    print("propagated")
+//    print("propagated")
     
     x.value = 10
+//    print(Incremental.shared.queue)
     y.value = 20
+//    print(Incremental.shared.queue)
     Incremental.shared.propagate()
     print("Done")
+    observer = nil
+    sum = nil
+    print("Done?")
 }
 
-func test2() {
-    let x = Var(5)
-    let sum = I(variable: x).zip(I(variable: x), +)
-    let observer = sum.observe {
-        print("sum: \($0)")
-    }
-    Incremental.shared.propagate()
-    x.value = 6
-    Incremental.shared.propagate()
-}
 
 func testReduce() {
     var (x, tail) = Incremental.shared.list(from: [0,1,2,3])
@@ -126,7 +148,6 @@ func testReduce() {
     
     tail.write(.cons(4, tail: I(value: .empty)))
     Incremental.shared.propagate()
-    
 }
 
 struct Person: Equatable {
@@ -284,7 +305,7 @@ func binaryTreeExample() {
     }
 }
 
-binaryTreeExample()
+//binaryTreeExample()
 //garbageCollectionLarger()
 //
 //testArrayFilterSort()

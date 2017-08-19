@@ -95,7 +95,8 @@ extension Incremental {
     
     func reduce<A, Result>(isEqual: @escaping (Result, Result) -> Bool, _ list: I<IList<A>>, _ initial: Result, _ transform: @escaping (Result, A) -> Result) -> I<Result> {
         func reduceH(_ list: I<IList<A>>, intermediate: Result, destination: I<Result>) {
-            list.read {
+            destination.strongReferences.add(list)
+            list.read { [unowned destination] in
                 switch $0 {
                 case .empty:
                     destination.write(intermediate)
@@ -111,7 +112,8 @@ extension Incremental {
     
     func appending<Element>(list: I<IList<Element>>, element: Element) -> I<IList<Element>> {
         func appendingH(list: I<IList<Element>>, dest: I<IList<Element>>) {
-            list.read { switch $0 {
+            dest.strongReferences.add(list)
+            list.read { [unowned dest] in switch $0 {
             case .empty:
                 let tail = I<IList<Element>>(value: IList.empty)
                 dest.write(IList<Element>.cons(element, tail: tail))
@@ -140,7 +142,8 @@ extension Incremental {
     
     func filter<Element>(list: I<IList<Element>>, _ condition: @escaping (Element) -> Bool) -> I<IList<Element>> {
         func recurse(list: I<IList<Element>>, destination: I<IList<Element>>) {
-            list.read { l in
+            destination.strongReferences.add(list)
+            list.read { [unowned destination] l in
                 switch l {
                 case .empty:
                     destination.write(.empty)
@@ -163,10 +166,10 @@ extension Incremental {
     // Todo abstract out the duplication between `filter` and `sort`.
     func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
         var initial = array.initial.filter(condition)
-        
         let filteredChanges: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
         func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
-            changes.read { switch $0 {
+            destination.strongReferences.add(changes)
+            changes.read { [unowned destination] in switch $0 {
             case .empty:
                 destination.write(.empty)
             case let .cons(change, tail: tail):
@@ -187,7 +190,8 @@ extension Incremental {
         let changes: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
         func sortH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, array: [Element], current: SortedArray<Element>) {
             var copy = current
-            changes.read { switch $0 {
+            destination.strongReferences.add(changes)
+            changes.read { [unowned destination] in switch $0 {
             case .empty: destination.write(.empty)
             case let .cons(change, tail: tail):
                 let newTail: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
