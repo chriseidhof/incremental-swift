@@ -67,7 +67,8 @@ class IncrementalTests: XCTestCase {
         }
         XCTAssertEqual(results, [0,1,3,7])
     }
-
+    
+ 
     // Memory tests
     
     func testDeinit() {

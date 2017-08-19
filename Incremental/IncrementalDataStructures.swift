@@ -164,10 +164,11 @@ extension Incremental {
     }
     
     // Todo abstract out the duplication between `filter` and `sort`.
+    // Todo this implementation is broken, we need to make sure to update indices (insert/remove etc.).
     func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
         var initial = array.initial.filter(condition)
         let filteredChanges: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
-        func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
+        func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, skipped: Int, current: [Element]) {
             destination.strongReferences.add(changes)
             changes.read { [unowned destination] in switch $0 {
             case .empty:
@@ -182,7 +183,7 @@ extension Incremental {
                 }
             }}
         }
-        filterH(changes: array.changes, destination: filteredChanges, current: initial)
+        filterH(changes: array.changes, destination: filteredChanges, skipped: 0, current: initial)
         return IArray(initial: initial, changes: filteredChanges)
     }
     

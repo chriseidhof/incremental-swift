@@ -19,34 +19,7 @@ extension App: Equatable {
     }
 }
 
-func if_<A: Equatable>(_ cond: I<Bool>, _ then: @autoclosure @escaping () -> I<A>, else alt:  @autoclosure @escaping () -> I<A>) -> I<A> {
-    return cond.flatMap { $0 ? then() : alt() }
-}
 
-
-
-
-func testArray() {
-    let (arr, change) = Incremental.shared.array(initial: [] as [Int])
-    let latest: I<[Int]> = Incremental.shared.reduce(isEqual: ==, arr.changes, arr.initial) { l, el in
-        l.applying(change: el)
-    }
-
-    let size: I<String> = if_(latest.map { $0.count > 1 }, I(constant: "large"), else: I(constant: "small"))
-    let observer = size.observe {
-        print($0)
-    }
-    print("---")
-    change(.append(4))
-    Incremental.shared.propagate()
-    change(.append(5))
-    change(.insert(element: 0, at: 0))
-    Incremental.shared.propagate()
-    change(.remove(elementAt: 0))
-    change(.remove(elementAt: 0))
-//    change(.remove(elementAt: 0))
-    Incremental.shared.propagate()
-}
 //testArray()
 
 enum MyApp {
@@ -85,44 +58,6 @@ func testGui() {
 
     Incremental.shared.propagate()
 }
-//testGui()
-
-func test() {
-    let x = Var(5)
-    let y = Var(6)
-    let y1 = I(variable: y)
-    var sum: I<Int>! = I(variable: x).zip(y1, +)
-    var observer: Any? = sum.observe {
-        print("result: \($0)")
-    }
-    Incremental.shared.propagate()
-//    print("propagated")
-    
-    x.value = 10
-//    print(Incremental.shared.queue)
-    y.value = 20
-//    print(Incremental.shared.queue)
-    Incremental.shared.propagate()
-    print("Done")
-    observer = nil
-    sum = nil
-    print("Done?")
-}
-
-
-func testReduce() {
-    var (x, tail) = Incremental.shared.list(from: [0,1,2,3])
-    func tracedSum(x: Int, y: Int) -> Int {
-        print("tracing sum: \((x, y))")
-        return x + y
-    }
-    let reduced = Incremental.shared.reduce(isEqual: ==, x, 0, tracedSum)
-    let observer = reduced.observe { print($0) }
-    Incremental.shared.propagate()
-    
-    tail.write(.cons(4, tail: I(value: .empty)))
-    Incremental.shared.propagate()
-}
 
 struct Person: Equatable {
     let name: String
@@ -143,7 +78,6 @@ func testValidation() {
 
     let validPassword: I<String?> = I(variable: password).mapE(==) { $0.isEmpty ? nil : $0 }
     let successPassword: I<String?> = validPassword.zipE(I(variable: passwordRepeat), ==, { p1, p2 in
-        //print("trace \(p1, p2, p1==p2)")
         return p1 == p2 ? p1 : nil
     })
     
@@ -157,40 +91,6 @@ func testValidation() {
     Incremental.shared.propagate()
     password.value = "one"
     passwordRepeat.value = "one"
-    Incremental.shared.propagate()
-}
-
-func testArrayFilter() {
-    let (arr, change) = Incremental.shared.array(initial: [0, 1, 2, 3, 4, 5])
-    let filtered = Incremental.shared.filter(array: arr, condition: {
-        print("trace: \($0)")
-        return $0 % 2 == 0
-    })
-    filtered.latest.observe { i in
-        print("latest: \(i)")
-    }
-    let x = arr.latest.observe { print("original: \($0)")}
-    Incremental.shared.propagate()
-    change(.append(6))
-    change(.append(7))
-    Incremental.shared.propagate()
-}
-
-
-func testArrayFilterSort() {
-    let (arr, change) = Incremental.shared.array(initial: ["xx", "zero", "one", "two", "three", "four"])
-    let filtered = Incremental.shared.filter(array: arr, condition: {
-        return $0.characters.count > 2
-    })
-    let sorted = Incremental.shared.sort(array: filtered, String.comparator)
-    let observer = sorted.latest.observe { i in
-        print("latest: \(i)")
-    }
-    arr.latest.observe { print("original: \($0)")}
-    Incremental.shared.propagate()
-    change(.append("hello world"))
-    change(.append("x"))
-    change(.remove(elementAt: 0))
     Incremental.shared.propagate()
 }
 
@@ -278,24 +178,3 @@ func binaryTreeExample() {
         Incremental.shared.propagate()
     }
 }
-
-//binaryTreeExample()
-//garbageCollectionLarger()
-//
-//testArrayFilterSort()
-//testArrayFilter()
-//testValidation()
-//testReduce()
-//test()
-//test2()
-//testGui()
-//testArray()
-//testMinimal()
-//
-//
-//
-
-//Todo:
-//- IArray.sorted
-//- IArray[0..<n] - independent slices
-

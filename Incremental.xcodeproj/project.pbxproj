@@ -22,6 +22,8 @@
 		832066DD1F28F6B900965174 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 832066DB1F28F6B900965174 /* Main.storyboard */; };
 		832066DF1F28F6B900965174 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 832066DE1F28F6B900965174 /* Assets.xcassets */; };
 		832066E21F28F6B900965174 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 832066E01F28F6B900965174 /* LaunchScreen.storyboard */; };
+		832B02B31F4881200046D344 /* IncrementalStdLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832B02B11F48811B0046D344 /* IncrementalStdLib.swift */; };
+		832B02B51F4882040046D344 /* IncrementalArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832B02B41F4882040046D344 /* IncrementalArrayTests.swift */; };
 		833C25361F29CD4900B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
 		833C25371F29D05D00B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
 		833C25381F29D05D00B4A29D /* BinaryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833C25351F29CD4900B4A29D /* BinaryTree.swift */; };
@@ -32,20 +34,11 @@
 		839A14161F247A9500C49C81 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14151F247A9500C49C81 /* ViewController.swift */; };
 		839A14191F247A9500C49C81 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 839A14171F247A9500C49C81 /* Main.storyboard */; };
 		839A141B1F247A9500C49C81 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 839A141A1F247A9500C49C81 /* Assets.xcassets */; };
-		839A14241F247ACF00C49C81 /* Incremental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14231F247ACF00C49C81 /* Incremental.swift */; };
-		839A14261F247B0500C49C81 /* IncrementalDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */; };
 		839A14271F247B9E00C49C81 /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC31F237038004A6953 /* Clock.swift */; };
-		839A14281F247B9E00C49C81 /* SortedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC51F237047004A6953 /* SortedArray.swift */; };
-		839A14291F247B9E00C49C81 /* Incremental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14231F247ACF00C49C81 /* Incremental.swift */; };
-		839A142A1F247B9E00C49C81 /* IncrementalDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */; };
 		839A142C1F247BAF00C49C81 /* TableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A142B1F247BAF00C49C81 /* TableVC.swift */; };
 		83BCD6021F28F8680069F15D /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC31F237038004A6953 /* Clock.swift */; };
-		83BCD6031F28F8680069F15D /* SortedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC51F237047004A6953 /* SortedArray.swift */; };
-		83BCD6041F28F8680069F15D /* Incremental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14231F247ACF00C49C81 /* Incremental.swift */; };
-		83BCD6051F28F8680069F15D /* IncrementalDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */; };
 		83FC7CBD1F236800004A6953 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CBC1F236800004A6953 /* main.swift */; };
 		83FC7CC41F237038004A6953 /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC31F237038004A6953 /* Clock.swift */; };
-		83FC7CC61F237047004A6953 /* SortedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FC7CC51F237047004A6953 /* SortedArray.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +80,8 @@
 		832066DE1F28F6B900965174 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		832066E11F28F6B900965174 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		832066E31F28F6B900965174 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		832B02B11F48811B0046D344 /* IncrementalStdLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncrementalStdLib.swift; sourceTree = "<group>"; };
+		832B02B41F4882040046D344 /* IncrementalArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncrementalArrayTests.swift; sourceTree = "<group>"; };
 		833C25351F29CD4900B4A29D /* BinaryTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryTree.swift; sourceTree = "<group>"; };
 		833C25391F2A0F0C00B4A29D /* StackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackViewController.swift; sourceTree = "<group>"; };
 		83818BFA1F472F3000875842 /* IncrementalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IncrementalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +153,10 @@
 		830C2B1D1F322DBC00161F85 /* Incremental */ = {
 			isa = PBXGroup;
 			children = (
+				83FC7CC51F237047004A6953 /* SortedArray.swift */,
+				839A14231F247ACF00C49C81 /* Incremental.swift */,
+				832B02B11F48811B0046D344 /* IncrementalStdLib.swift */,
+				839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */,
 				830C2B1E1F322DBC00161F85 /* Incremental.h */,
 				830C2B1F1F322DBC00161F85 /* Info.plist */,
 			);
@@ -194,6 +193,7 @@
 			children = (
 				83818BFC1F472F3100875842 /* IncrementalTests.swift */,
 				83818BFE1F472F3100875842 /* Info.plist */,
+				832B02B41F4882040046D344 /* IncrementalArrayTests.swift */,
 			);
 			path = IncrementalTests;
 			sourceTree = "<group>";
@@ -243,9 +243,6 @@
 			children = (
 				83FC7CBC1F236800004A6953 /* main.swift */,
 				83FC7CC31F237038004A6953 /* Clock.swift */,
-				83FC7CC51F237047004A6953 /* SortedArray.swift */,
-				839A14231F247ACF00C49C81 /* Incremental.swift */,
-				839A14251F247B0500C49C81 /* IncrementalDataStructures.swift */,
 				833C25351F29CD4900B4A29D /* BinaryTree.swift */,
 			);
 			path = IncrementalCLI;
@@ -481,6 +478,7 @@
 				830C2B261F322DCC00161F85 /* Incremental.swift in Sources */,
 				830C2B281F322DCC00161F85 /* BinaryTree.swift in Sources */,
 				830C2B271F322DCC00161F85 /* IncrementalDataStructures.swift in Sources */,
+				832B02B31F4881200046D344 /* IncrementalStdLib.swift in Sources */,
 				830C2B241F322DCC00161F85 /* Clock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -497,10 +495,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83BCD6051F28F8680069F15D /* IncrementalDataStructures.swift in Sources */,
 				833C25381F29D05D00B4A29D /* BinaryTree.swift in Sources */,
-				83BCD6041F28F8680069F15D /* Incremental.swift in Sources */,
-				83BCD6031F28F8680069F15D /* SortedArray.swift in Sources */,
 				83BCD6021F28F8680069F15D /* Clock.swift in Sources */,
 				832066DA1F28F6B900965174 /* ViewController.swift in Sources */,
 				832066D81F28F6B900965174 /* AppDelegate.swift in Sources */,
@@ -511,6 +506,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				832B02B51F4882040046D344 /* IncrementalArrayTests.swift in Sources */,
 				83818BFD1F472F3100875842 /* IncrementalTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,9 +516,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				833C25371F29D05D00B4A29D /* BinaryTree.swift in Sources */,
-				839A142A1F247B9E00C49C81 /* IncrementalDataStructures.swift in Sources */,
-				839A14291F247B9E00C49C81 /* Incremental.swift in Sources */,
-				839A14281F247B9E00C49C81 /* SortedArray.swift in Sources */,
 				839A14271F247B9E00C49C81 /* Clock.swift in Sources */,
 				839A14161F247A9500C49C81 /* ViewController.swift in Sources */,
 				833C253A1F2A0F0C00B4A29D /* StackViewController.swift in Sources */,
@@ -536,10 +529,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83FC7CC41F237038004A6953 /* Clock.swift in Sources */,
-				83FC7CC61F237047004A6953 /* SortedArray.swift in Sources */,
 				833C25361F29CD4900B4A29D /* BinaryTree.swift in Sources */,
-				839A14261F247B0500C49C81 /* IncrementalDataStructures.swift in Sources */,
-				839A14241F247ACF00C49C81 /* Incremental.swift in Sources */,
 				83FC7CBD1F236800004A6953 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
