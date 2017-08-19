@@ -51,6 +51,25 @@ class IncrementalTests: XCTestCase {
         observer = nil
     }
     
+    func testReduce() {
+        let start: [Int] = []
+        var (list, tail) = Incremental.shared.list(from: start)
+        let reduced = Incremental.shared.reduce(isEqual: ==, list, 0, +)
+        var results: [Int] = []
+        let observer = reduced.observe {
+            results.append($0)
+        }
+        for x in [0,1,2,0,4] {
+            let newTail: I<IList<Int>> = I(value: .empty)
+            tail.write(.cons(x, tail: newTail))
+            tail = newTail
+            Incremental.shared.propagate()
+        }
+        XCTAssertEqual(results, [0,1,3,7])
+    }
+
+    // Memory tests
+    
     func testDeinit() {
         let x: Var<Int>? = Var(10)
         var deinited = false

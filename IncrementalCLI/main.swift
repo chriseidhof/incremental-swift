@@ -23,34 +23,8 @@ func if_<A: Equatable>(_ cond: I<Bool>, _ then: @autoclosure @escaping () -> I<A
     return cond.flatMap { $0 ? then() : alt() }
 }
 
-func testSum() {
-    let x = Var(5)
-    let y = Var(10)
-    let sum = I(variable: x).zip(I(variable: y), +)
-    let disposable = sum.observe { print($0) }
-    x.value = 6
-    x.value = 17
-    x.value = 10
-    Incremental.shared.propagate()
-    x.value = 20
-    Incremental.shared.propagate()
-}
-//testSum()
 
-func testMinimal() {
-    let start: [Int] = []
-    var (list, tail) = Incremental.shared.list(from: start)
-    let reduced = Incremental.shared.reduce(isEqual: ==, list, 0, +)
-    let observer = reduced.observe {
-        print($0)
-    }
-    for x in [0,1,2] {
-        let newTail: I<IList<Int>> = I(value: .empty)
-        tail.write(.cons(x, tail: newTail))
-        tail = newTail
-        Incremental.shared.propagate()
-    }
-}
+
 
 func testArray() {
     let (arr, change) = Incremental.shared.array(initial: [] as [Int])
