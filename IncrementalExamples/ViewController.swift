@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Incremental_iOS
 
 class ViewController: UITableViewController {
     var backing: [String] = []
@@ -17,13 +18,14 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        backing = ["One", "Two", "Three", "Four"]
-        let (arr, change) = Incremental.shared.array(initial: backing)
+        let (arr, change) = Incremental.shared.array(initial: ["One", "Two", "Three", "Four"])
         self.change = change
         var pendingChanges: [ArrayChange<String>] = []
         
         let filtered: IArray<String> = Incremental.shared.filter(array: arr, condition: { $0.characters.count > 3 })
-        let signal: I<()> = Incremental.shared.reduce(isEqual: { _, _ in false }, filtered.changes, (), { _, change in
+        let sorted = Incremental.shared.sort(array: filtered, { $0.compare($1) })
+        backing = sorted.initial
+        let signal: I<()> = Incremental.shared.reduce(isEqual: { _, _ in false }, sorted.changes, (), { _, change in
             self.backing.apply(change: change)
             pendingChanges.append(change)
         })

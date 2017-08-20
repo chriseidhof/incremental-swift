@@ -30,9 +30,27 @@ class IncrementalArrayTests: XCTestCase {
         Incremental.shared.propagate()
         XCTAssertEqual(result, ["small", "large"])
     }
+    
 
-
-    func testArrayFilter() {
+    func testArrayFilterAppend() {
+        let (arr, change) = Incremental.shared.array(initial: [0, 1, 2, 3, 4, 5])
+        let filtered = Incremental.shared.filter(array: arr, condition: {
+            return $0 % 2 == 0
+        })
+        var result: [[Int]] = []
+        let observer = filtered.latest.observe { i in
+            result.append(i)
+        }
+        XCTAssert(filtered.initial == [0,2,4])
+        Incremental.shared.propagate()
+        XCTAssert(result.count == 1 && result[0] == [0,2,4])
+        change(.append(6))
+        change(.append(7))
+        Incremental.shared.propagate()
+        XCTAssert(result.count == 2 && result[1] == [0,2,4,6])
+    }
+    
+    func testArrayFilterRemove() {
         let (arr, change) = Incremental.shared.array(initial: [0, 1, 2, 3, 4, 5])
         let filtered = Incremental.shared.filter(array: arr, condition: {
             return $0 % 2 == 0
@@ -43,10 +61,33 @@ class IncrementalArrayTests: XCTestCase {
         }
         Incremental.shared.propagate()
         XCTAssert(result.count == 1 && result[0] == [0,2,4])
-        change(.append(6))
-        change(.append(7))
+        change(.remove(elementAt: 1)) // remove '1'
         Incremental.shared.propagate()
-        XCTAssert(result.count == 2 && result[1] == [0,2,4,6])
+        XCTAssert(result.count == 1)
+        change(.remove(elementAt: 3)) // remove '4'
+        Incremental.shared.propagate()
+        XCTAssert(result.count == 2)
+        XCTAssertEqual(result[1], [0,2])
+    }
+    
+    func testArrayFilterInsert() {
+        let (arr, change) = Incremental.shared.array(initial: [0, 1, 2, 3, 4, 5])
+        let filtered = Incremental.shared.filter(array: arr, condition: {
+            return $0 % 2 == 0
+        })
+        var result: [[Int]] = []
+        let observer = filtered.latest.observe { i in
+            result.append(i)
+        }
+        Incremental.shared.propagate()
+        XCTAssert(result.count == 1 && result[0] == [0,2,4])
+        change(.insert(element: 1, at: 1))
+        Incremental.shared.propagate()
+        XCTAssert(result.count == 1)
+//        change(.remove(elementAt: 3)) // remove '4'
+//        Incremental.shared.propagate()
+//        XCTAssert(result.count == 2)
+//        XCTAssertEqual(result[1], [0,2])
     }
     
     func testArrayChanges() {
@@ -63,23 +104,23 @@ class IncrementalArrayTests: XCTestCase {
         XCTAssertEqual(latest, ["zero", "one", "two", "three", "four"])
     }
     
-    func testArrayFilter2() {
-        let (arr, change) = Incremental.shared.array(initial: ["xx", "zero", "one", "two", "three", "four"])
-        let filtered = Incremental.shared.filter(array: arr, condition: {
-            return $0.characters.count > 2
-        })
-        var latest: [String] = []
-        let observer = filtered.latest.observe {
-            latest = $0
-        }
-        Incremental.shared.propagate()
-        
-        XCTAssertEqual(latest, ["zero", "one", "two", "three", "four"])
-        change(.remove(elementAt: 0))
-        Incremental.shared.propagate()
-        XCTAssertEqual(latest, ["zero", "one", "two", "three", "four"])
-
-    }
+//    func testArrayFilter2() {
+//        let (arr, change) = Incremental.shared.array(initial: ["xx", "zero", "one", "two", "three", "four"])
+//        let filtered = Incremental.shared.filter(array: arr, condition: {
+//            return $0.characters.count > 2
+//        })
+//        var latest: [String] = []
+//        let observer = filtered.latest.observe {
+//            latest = $0
+//        }
+//        Incremental.shared.propagate()
+//
+//        XCTAssertEqual(latest, ["zero", "one", "two", "three", "four"])
+//        change(.remove(elementAt: 0))
+//        Incremental.shared.propagate()
+//        XCTAssertEqual(latest, ["zero", "one", "two", "three", "four"])
+//
+//    }
     
 //    func testArrayFilterSort() {
 //        let (arr, change) = Incremental.shared.array(initial: ["xx", "zero", "one", "two", "three", "four"])

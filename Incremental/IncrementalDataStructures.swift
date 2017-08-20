@@ -8,12 +8,12 @@
 
 import Foundation
 
-enum ArrayChange<Element>: Equatable where Element: Equatable {
+public enum ArrayChange<Element>: Equatable where Element: Equatable {
     case insert(element: Element, at: Int)
     case remove(elementAt: Int)
     case append(Element)
     
-    static func ==(lhs: ArrayChange<Element>, rhs: ArrayChange<Element>) -> Bool {
+    public static func ==(lhs: ArrayChange<Element>, rhs: ArrayChange<Element>) -> Bool {
         switch (lhs, rhs) {
         case (.insert(let e1, let a1), .insert(let e2, let a2)):
             return e1 == e2 && a1 == a2
@@ -38,12 +38,12 @@ enum ArrayChange<Element>: Equatable where Element: Equatable {
 //}
 
 extension Array where Element: Equatable {
-    func applying(change: ArrayChange<Element>) -> [Element] {
+    public func applying(change: ArrayChange<Element>) -> [Element] {
         var copy = self
         copy.apply(change: change)
         return copy
     }
-    mutating func apply(change: ArrayChange<Element>) {
+    public mutating func apply(change: ArrayChange<Element>) {
         switch change {
         case let .insert(element: e, at: i):
             self.insert(e, at: i)
@@ -55,34 +55,51 @@ extension Array where Element: Equatable {
     }
 }
 
-indirect enum IList<A: Equatable>: Equatable {
+public indirect enum IList<A: Equatable>: Equatable {
     case empty
     case cons(A, tail: I<IList<A>>)
     
-    static func ==(lhs: IList, rhs: IList) -> Bool {
+    public static func ==(lhs: IList, rhs: IList) -> Bool {
         if case .empty = lhs, case .empty = rhs { return true }
         return false
     }
 }
 
-struct IArray<Element: Equatable>: Equatable {
-    let initial: [Element]
-    let changes: I<IList<ArrayChange<Element>>>
+public struct IArray<Element: Equatable>: Equatable {
+    public let initial: [Element]
+    public let changes: I<IList<ArrayChange<Element>>>
     
-    var latest: I<[Element]> {
+    public var latest: I<[Element]> {
         return Incremental.shared.reduce(isEqual: ==, changes, initial) { l, el in
             l.applying(change: el)
         }
     }
 }
 
-func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
+public func ==<A>(lhs: IArray<A>, rhs: IArray<A>) -> Bool {
     return false
+}
+
+extension Array {
+    func filterWithSkipped(_ condition: (Element) -> Bool) -> ([Int], [Element]) {
+        var skipped: [Int] = []
+        var result: [Element] = []
+        for x in self {
+            let last = skipped.last ?? 0
+            if condition(x) {
+                skipped.append(last)
+                result.append(x)
+            } else {
+                skipped.append(last + 1)
+            }
+        }
+        return (skipped, result)
+    }
 }
 
 extension Incremental {
     /// A constant list: you are only allowed to append (using the second result parameter)
-    func list<S: Sequence, Element>(from sequence: S) -> (I<IList<Element>>, I<IList<Element>>) where S.Iterator.Element == Element, Element: Equatable {
+    public func list<S: Sequence, Element>(from sequence: S) -> (I<IList<Element>>, I<IList<Element>>) where S.Iterator.Element == Element, Element: Equatable {
         let tail: I<IList<Element>> = I()
         var result: I<IList<Element>> = tail
         for item in sequence.reversed() {
@@ -93,7 +110,7 @@ extension Incremental {
         return (result, tail)
     }
     
-    func reduce<A, Result>(isEqual: @escaping (Result, Result) -> Bool, _ list: I<IList<A>>, _ initial: Result, _ transform: @escaping (Result, A) -> Result) -> I<Result> {
+    public func reduce<A, Result>(isEqual: @escaping (Result, Result) -> Bool, _ list: I<IList<A>>, _ initial: Result, _ transform: @escaping (Result, A) -> Result) -> I<Result> {
         func reduceH(_ list: I<IList<A>>, intermediate: Result, destination: I<Result>) {
             destination.strongReferences.add(list)
             list.read { [unowned destination] in
@@ -110,7 +127,7 @@ extension Incremental {
         return destination
     }
     
-    func appending<Element>(list: I<IList<Element>>, element: Element) -> I<IList<Element>> {
+    public func appending<Element>(list: I<IList<Element>>, element: Element) -> I<IList<Element>> {
         func appendingH(list: I<IList<Element>>, dest: I<IList<Element>>) {
             dest.strongReferences.add(list)
             list.read { [unowned dest] in switch $0 {
@@ -128,7 +145,7 @@ extension Incremental {
         return destination
     }
     
-    func array<Element: Equatable>(initial: [Element]) -> (IArray<Element>, change: (ArrayChange<Element>) -> ()) {
+    public func array<Element: Equatable>(initial: [Element]) -> (IArray<Element>, change: (ArrayChange<Element>) -> ()) {
         let x: [ArrayChange<Element>] = []
         var (changes, tail) = list(from: x)
         func appendChange(change: ArrayChange<Element>) {
@@ -140,7 +157,7 @@ extension Incremental {
         return (IArray(initial: initial, changes: changes), appendChange)
     }
     
-    func filter<Element>(list: I<IList<Element>>, _ condition: @escaping (Element) -> Bool) -> I<IList<Element>> {
+    public func filter<Element>(list: I<IList<Element>>, _ condition: @escaping (Element) -> Bool) -> I<IList<Element>> {
         func recurse(list: I<IList<Element>>, destination: I<IList<Element>>) {
             destination.strongReferences.add(list)
             list.read { [unowned destination] l in
@@ -164,30 +181,39 @@ extension Incremental {
     }
     
     // Todo abstract out the duplication between `filter` and `sort`.
-    // Todo this implementation is broken, we need to make sure to update indices (insert/remove etc.).
-    func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
-        var initial = array.initial.filter(condition)
+    public func filter<Element>(array: IArray<Element>, condition: @escaping (Element) -> Bool) -> IArray<Element> {
         let filteredChanges: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
-        func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, skipped: Int, current: [Element]) {
+        func filterH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, current: [Element]) {
             destination.strongReferences.add(changes)
             changes.read { [unowned destination] in switch $0 {
             case .empty:
                 destination.write(.empty)
             case let .cons(change, tail: tail):
-                if let result = current.applying(change: change, for: condition) {
-                    let newTail: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
-                    destination.write(.cons(change, tail: newTail))
-                    filterH(changes: tail, destination: newTail, current: result)
-                } else {
-                    filterH(changes: tail, destination: destination, current: current)
+                let newDestination: I<IList<ArrayChange<Element>>>
+                let new = current.applying(change: change)
+                switch change {
+                case .append(let el) where condition(el):
+                    newDestination = I(isEqual: ==)
+                    destination.write(.cons(change, tail: newDestination))
+                case .remove(elementAt: let index) where condition(current[index]):
+                    newDestination = I(isEqual: ==)
+                    let newIndex = current.filteredIndex(condition, for: index)
+                    destination.write(.cons(.remove(elementAt: newIndex), tail: newDestination))
+                case .insert(element: let el, at: let index) where condition(el):
+                    newDestination = I(isEqual: ==)
+                    let newIndex = current.filteredIndex(condition, for: index)
+                    destination.write(.cons(.insert(element: el, at: newIndex), tail: newDestination))
+                default:
+                    newDestination = destination
                 }
-            }}
+                filterH(changes: tail, destination: newDestination, current: new)
+            } }
         }
-        filterH(changes: array.changes, destination: filteredChanges, skipped: 0, current: initial)
-        return IArray(initial: initial, changes: filteredChanges)
+        filterH(changes: array.changes, destination: filteredChanges, current: array.initial)
+        return IArray(initial: array.initial.filter(condition), changes: filteredChanges)
     }
     
-    func sort<Element>(array: IArray<Element>, _ sortDescriptor: @escaping (Element,Element) -> ComparisonResult) -> IArray<Element> {
+    public func sort<Element>(array: IArray<Element>, _ sortDescriptor: @escaping (Element,Element) -> ComparisonResult) -> IArray<Element> {
         let changes: I<IList<ArrayChange<Element>>> = I(isEqual: ==)
         func sortH(changes: I<IList<ArrayChange<Element>>>, destination: I<IList<ArrayChange<Element>>>, array: [Element], current: SortedArray<Element>) {
             var copy = current
@@ -219,8 +245,22 @@ extension Incremental {
     }
 }
 
+extension Array {
+    func filteredIndex(_ condition: (Element) -> Bool, for index: Int) -> Int {
+        var removed = 0
+        var current = startIndex
+        while current < index {
+            if !condition(self[current]) {
+                removed += 1
+            }
+            current += 1
+        }
+        return index - removed
+    }
+}
+
 extension Array where Element: Equatable {
-    func applying(change: ArrayChange<Element>, for condition: (Element) -> Bool) -> [Element]? {
+    public func applying(change: ArrayChange<Element>, for condition: (Element) -> Bool) -> [Element]? {
         switch change {
         case .append(let x):
             return condition(x) ? applying(change: change) : nil
